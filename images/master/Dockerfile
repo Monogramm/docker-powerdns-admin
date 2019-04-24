@@ -1,0 +1,59 @@
+FROM alpine
+
+LABEL maintainer="Monogramm Maintainers <opensource at monogramm dot io>"
+
+ENV PDNSADMIN_VERSION=master
+
+RUN set -ex; \
+	apk update; \
+    apk add --no-cache \
+		build-base \
+		curl \
+		libffi-dev \
+		libxslt-dev \
+		mariadb-dev \
+		npm \
+		openldap-dev \
+		postgresql-libs \
+		postgresql-dev \
+		python3 \
+		python3-dev \
+		unzip \
+		xmlsec-dev \
+		yarn \
+	; \
+	mkdir -p /usr/src/; \
+    mkdir -p /var/www/powerdns-admin; \
+    rm -rf /var/cache/apk/*
+
+WORKDIR /var/www/powerdns-admin
+
+ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${PDNSADMIN_VERSION}.zip /tmp/powerdns-admin.zip
+
+RUN mkdir -p /tmp/powerdns-admin; \
+	unzip -q /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
+	rm /tmp/powerdns-admin.zip; \
+	mkdir -p /usr/src/powerdns-admin; \
+	cp -r /tmp/powerdns-admin/powerdns-admin-${PDNSADMIN_VERSION}/* /usr/src/powerdns-admin; \
+	rm -rf /tmp/powerdns-admin; \
+	cp /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
+	rm -rf \
+		/var/www/powerdns-admin/config \
+		/var/www/powerdns-admin/docker \
+		/var/www/powerdns-admin/migrations \
+		/var/www/powerdns-admin/tests \
+		/var/www/powerdns-admin/.env \
+		/var/www/powerdns-admin/env-test \
+		/var/www/powerdns-admin/docker-compose*.yml \
+		/var/www/powerdns-admin/config_template.py \
+	; \
+	pip3 install --upgrade pip; \
+    pip3 install psycopg2; \
+	pip3 install -r /var/www/powerdns-admin/requirements.txt
+
+COPY config_template.py generate_salt.py /var/www/powerdns-admin/
+COPY entrypoint.sh /entrypoint.sh
+
+EXPOSE 9191
+
+ENTRYPOINT ["/entrypoint.sh"]
