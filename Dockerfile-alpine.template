@@ -36,7 +36,8 @@ RUN mkdir -p /tmp/powerdns-admin; \
 	mkdir -p /usr/src/powerdns-admin; \
 	mv /tmp/powerdns-admin/PowerDNS-Admin-*/ /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
-	cp /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
+	ls -al /usr/src/powerdns-admin/; \
+	cp -r /usr/src/powerdns-admin/PowerDNS-Admin-*/* /var/www/powerdns-admin/; \
 	ls -al /var/www/powerdns-admin/; \
 	rm -rf \
 		/var/www/powerdns-admin/config/ \
