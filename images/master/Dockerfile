@@ -34,11 +34,9 @@ RUN mkdir -p /tmp/powerdns-admin; \
 	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
 	rm /tmp/powerdns-admin.zip; \
 	mkdir -p /usr/src/powerdns-admin; \
-	mv /tmp/powerdns-admin/PowerDNS-Admin-*/ /usr/src/powerdns-admin; \
+	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
-	ls -al /usr/src/powerdns-admin/; \
-	cp -r /usr/src/powerdns-admin/PowerDNS-Admin-*/* /var/www/powerdns-admin/; \
-	ls -al /var/www/powerdns-admin/; \
+	cp -r /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
 	rm -rf \
 		/var/www/powerdns-admin/config/ \
 		/var/www/powerdns-admin/docker/ \
