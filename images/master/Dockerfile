@@ -31,12 +31,13 @@ WORKDIR /var/www/powerdns-admin
 ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${PDNSADMIN_VERSION}.zip /tmp/powerdns-admin.zip
 
 RUN mkdir -p /tmp/powerdns-admin; \
-	unzip -q /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
+	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
 	rm /tmp/powerdns-admin.zip; \
 	mkdir -p /usr/src/powerdns-admin; \
 	mv /tmp/powerdns-admin/PowerDNS-Admin-*/ /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
 	cp /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
+	ls -al /var/www/powerdns-admin/; \
 	rm -rf \
 		/var/www/powerdns-admin/config/ \
 		/var/www/powerdns-admin/docker/ \
