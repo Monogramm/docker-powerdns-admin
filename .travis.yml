@@ -29,4 +29,4 @@ notifications:
 
 env: # Environments
     - VERSION=master VARIANT=alpine
-    - VERSION=0.1 VARIANT=alpine
+    - VERSION=v0.1 VARIANT=alpine

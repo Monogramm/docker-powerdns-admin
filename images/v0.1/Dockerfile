@@ -2,7 +2,7 @@ FROM alpine
 
 LABEL maintainer="Monogramm Maintainers <opensource at monogramm dot io>"
 
-ENV PDNSADMIN_VERSION=0.1
+ENV PDNSADMIN_VERSION=v0.1
 
 RUN set -ex; \
 	apk update; \

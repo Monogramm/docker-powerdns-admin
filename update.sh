@@ -19,7 +19,7 @@ function version_greater_or_equal() {
 
 dockerRepo="monogramm/docker-powerdns-admin"
 latests=( $( curl -fsSL 'https://api.github.com/repos/ngoduykhanh/powerdns-admin/tags' |tac|tac| \
-	grep -oE '[[:digit:]]+\.[[:digit:]]+' | \
+	grep -oE 'v[[:digit:]]+\.[[:digit:]]+' | \
 	sort -urV ) master )
 
 # Remove existing images
