@@ -13,7 +13,7 @@ before_script:
   - env | sort
   - name="powerdns-admin"
   - image="monogramm/docker-powerdns-admin:travis-${VERSION}${VARIANT:+-$VARIANT}"
-  - dir="images/${VERSION}/php${PHP_VERSION}-${VARIANT}"
+  - dir="images/${VERSION}/"
 
 script:
   - travis_retry docker build -t "$image" "$dir"
