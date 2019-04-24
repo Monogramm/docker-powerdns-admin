@@ -34,18 +34,20 @@ RUN mkdir -p /tmp/powerdns-admin; \
 	unzip -q /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
 	rm /tmp/powerdns-admin.zip; \
 	mkdir -p /usr/src/powerdns-admin; \
-	cp -r /tmp/powerdns-admin/powerdns-admin-${PDNSADMIN_VERSION}/* /usr/src/powerdns-admin; \
+	mv /tmp/powerdns-admin/PowerDNS-Admin-*/ /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
 	cp /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
 	rm -rf \
-		/var/www/powerdns-admin/config \
-		/var/www/powerdns-admin/docker \
-		/var/www/powerdns-admin/migrations \
-		/var/www/powerdns-admin/tests \
+		/var/www/powerdns-admin/config/ \
+		/var/www/powerdns-admin/docker/ \
+		/var/www/powerdns-admin/migrations/ \
+		/var/www/powerdns-admin/tests/ \
 		/var/www/powerdns-admin/.env \
-		/var/www/powerdns-admin/env-test \
-		/var/www/powerdns-admin/docker-compose*.yml \
+		/var/www/powerdns-admin/.travis.yml \
 		/var/www/powerdns-admin/config_template.py \
+		/var/www/powerdns-admin/docker-compose*.yml \
+		/var/www/powerdns-admin/env-test \
+		/var/www/powerdns-admin/run_travis.sh \
 	; \
 	pip3 install --upgrade pip; \
     pip3 install psycopg2; \
