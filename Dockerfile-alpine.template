@@ -30,7 +30,8 @@ WORKDIR /var/www/powerdns-admin
 
 ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${PDNSADMIN_VERSION}.zip /tmp/powerdns-admin.zip
 
-RUN mkdir -p /tmp/powerdns-admin; \
+RUN set -ex; \
+	mkdir -p /tmp/powerdns-admin; \
 	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
 	rm /tmp/powerdns-admin.zip; \
 	mkdir -p /usr/src/powerdns-admin; \
@@ -55,6 +56,9 @@ RUN mkdir -p /tmp/powerdns-admin; \
 
 COPY config_template.py generate_salt.py /var/www/powerdns-admin/
 COPY entrypoint.sh /entrypoint.sh
+
+RUN set -ex; \
+	chmod 755 /entrypoint.sh
 
 EXPOSE 9191
 
