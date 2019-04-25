@@ -39,7 +39,7 @@ fi
 
 
 echo "===> Database management"
-if [ ! -d "${DB_MIGRATION_DIR}" ]; then
+if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   echo "---> Running DB Init"
   flask db init --directory ${DB_MIGRATION_DIR}
   flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}

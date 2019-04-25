@@ -39,11 +39,15 @@ fi
 
 
 echo "===> Database management"
-if [ ! -d "${DB_MIGRATION_DIR}" ]; then
+if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   echo "---> Running DB Init"
   flask db init --directory ${DB_MIGRATION_DIR}
+  echo "---> Running DB Migration"
+  set +e
   flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
+  set -e
+  echo "---> Running data init"
   ./init_data.py
 
 else
