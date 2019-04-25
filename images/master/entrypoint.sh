@@ -64,5 +64,5 @@ yarn install --pure-lockfile
 echo "---> Running Flask assets"
 flask assets build
 
-echo "Run admin"
-./run.py
+echo "Start gunicorn server"
+exec "$@"

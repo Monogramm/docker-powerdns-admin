@@ -63,3 +63,4 @@ RUN set -ex; \
 EXPOSE 9191
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "-t 120", "-w 4", "--pythonpath=.", "-b 0.0.0.0:9191", "--log-level info", "app:app"]
