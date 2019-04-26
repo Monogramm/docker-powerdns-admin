@@ -16,6 +16,20 @@ if [[ -z ${PDNS_PORT} ]];
  then PDNS_PORT=8081
 fi
 
+
+# Wait for us to be able to connect to before proceeding
+if [ "${SQLA_DB_TYPE}" != "sqlite" ]; then
+  echo "===> Waiting for $PDA_DB_HOST Database service"
+  until nc -zv \
+    $PDA_DB_HOST \
+    $PDA_DB_PORT;
+  do
+    echo "Database ($PDA_DB_HOST) is unavailable - sleeping"
+    sleep 1
+  done
+fi
+
+
 echo "===> Configuration management"
 
 if [ ! -f config.py ]; then
