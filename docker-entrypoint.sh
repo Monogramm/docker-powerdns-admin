@@ -79,10 +79,11 @@ fi
 log "===> Assets management"
 log "---> Running Yarn"
 yarn install --pure-lockfile
+# Fix for https://github.com/ngoduykhanh/PowerDNS-Admin/issues/310
+ln -sf "$(pwd)/node_modules" ./app/static/node_modules
 
-# FIXME https://github.com/ngoduykhanh/PowerDNS-Admin/issues/310
-#log "---> Running Flask assets"
-#flask assets build
+log "---> Running Flask assets"
+flask assets build
 
 
 log "===> Start gunicorn server"
