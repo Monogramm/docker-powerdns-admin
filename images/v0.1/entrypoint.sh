@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 set -e
 
-WORK_DIR=/var/www/powerdns-admin/
-
-export FLASK_APP=app/__init__.py
+log() {
+  echo "[$(date +%Y-%m-%dT%H:%M:%S%:z)] $@"
+}
 
 # == Vars
 #
-DB_MIGRATION_DIR='/var/www/powerdns-admin/migrations'
+DB_MIGRATION_DIR=./migrations
 if [[ -z ${PDNS_PROTO} ]];
  then PDNS_PROTO="http"
 fi
@@ -17,70 +17,82 @@ if [[ -z ${PDNS_PORT} ]];
 fi
 
 
-# Wait for us to be able to connect to before proceeding
+# Wait for us to be able to connect to DB before proceeding
 if [ "${SQLA_DB_TYPE}" != "sqlite" ]; then
-  echo "===> Waiting for $PDA_DB_HOST Database service"
+  log "===> Waiting for $PDA_DB_HOST Database service"
   until nc -zv \
     $PDA_DB_HOST \
     $PDA_DB_PORT;
   do
-    echo "Database ($PDA_DB_HOST) is unavailable - sleeping"
+    log "Database ($PDA_DB_HOST) is unavailable - sleeping"
     sleep 1
   done
 fi
 
 
-echo "===> Configuration management"
+log "===> Configuration management"
 
 if [ ! -f config.py ]; then
-  echo "---> Creating default configuration"
+  log "---> Creating default configuration"
   cp config_template.py config.py
 
-  ## TODO Generate random secret if not set in config
-  #if grep 'We are the world' $WORK_DIR/config.py; then
-  #  echo "---> Generating random secret"
-  #  SECRET_KEY=$(openssl rand -hex 64)
-  #  sed -i "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" $WORK_DIR/config.py
-  #fi
-  ## TODO Generate random salt if default present
-  #if grep '$2b$12$yLUMTIfl21FKJQpTkRQXCu' $WORK_DIR/config.py; then
-  #  echo "---> Generating random salt"
-  #  SALT=$(python generate_salt.py)
-  #  sed -i "s|SALT = '.*'|SALT = '${SALT}'|g" $WORK_DIR/config.py
-  #fi
+  # Generate random secret if not set in config
+  if grep 'We are the world' ./config.py; then
+    log "---> Generating random secret"
+    SECRET_KEY=$(openssl rand -hex 64)
+    sed -i "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" ./config.py
+  fi
+
+  # Generate random salt if default present
+  if grep '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./config.py; then
+    log "---> Generating random salt"
+    SALT=$(python3 generate_salt.py)
+    sed -i "s|'SALT', '.*'|'SALT', '${SALT}'|g" ./config.py
+  fi
 
 fi
 
 
-echo "===> Database management"
+log "===> Database management"
 if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
-  echo "---> Running DB Init"
+
+  log "---> Running DB Init"
   flask db init --directory ${DB_MIGRATION_DIR}
-  echo "---> Running DB Migration"
+  log "---> Running DB Migration"
   set +e
   flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
-  echo "---> Running data init"
-  ./init_data.py
 
 else
-  echo "---> Running DB Migration"
+
+  log "---> Running DB Upgrade"
   set +e
-  flask db migrate -m "Upgrade DB Schema" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
+
 fi
 
 #echo "===> (TODO) Update PDNS API connection info"
 
 
-echo "===> Assets management"
-echo "---> Running Yarn"
+log "===> Assets management"
+log "---> Running Yarn"
 yarn install --pure-lockfile
 
-echo "---> Running Flask assets"
-flask assets build
+# FIXME https://github.com/ngoduykhanh/PowerDNS-Admin/issues/310
+#log "---> Running Flask assets"
+#flask assets build
 
-echo "Start gunicorn server"
-exec "$@"
+
+log "===> Start gunicorn server"
+GUNICORN_TIMEOUT="${GUINCORN_TIMEOUT:-120}"
+GUNICORN_WORKERS="${GUNICORN_WORKERS:-4}"
+GUNICORN_LOGLEVEL="${GUNICORN_LOGLEVEL:-info}"
+
+GUNICORN_ARGS="-t ${GUNICORN_TIMEOUT} --workers ${GUNICORN_WORKERS} --bind ${BIND_ADDRESS}:${PORT} --log-level ${GUNICORN_LOGLEVEL}"
+if [ "$1" == "gunicorn" ]; then
+    exec "$@" $GUNICORN_ARGS
+else
+    exec "$@"
+fi

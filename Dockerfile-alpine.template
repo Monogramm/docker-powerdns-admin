@@ -1,12 +1,12 @@
 FROM alpine
 
-LABEL maintainer="Monogramm Maintainers <opensource at monogramm dot io>"
+ARG PDNSADMIN_VERSION=%%VERSION%%
 
-ENV PDNSADMIN_VERSION=%%VERSION%%
+LABEL maintainer="Monogramm Maintainers <opensource at monogramm dot io>"
 
 RUN set -ex; \
 	apk update; \
-    apk add --no-cache \
+	apk add --no-cache \
 		build-base \
 		curl \
 		libffi-dev \
@@ -14,8 +14,11 @@ RUN set -ex; \
 		mariadb-dev \
 		npm \
 		openldap-dev \
-		postgresql-libs \
+		openssl \
+		openssl-dev \
 		postgresql-dev \
+		postgresql-libs \
+		py3-openssl \
 		python3 \
 		python3-dev \
 		unzip \
@@ -23,8 +26,8 @@ RUN set -ex; \
 		yarn \
 	; \
 	mkdir -p /usr/src/; \
-    mkdir -p /var/www/powerdns-admin; \
-    rm -rf /var/cache/apk/*
+	mkdir -p /var/www/powerdns-admin; \
+	rm -rf /var/cache/apk/*
 
 WORKDIR /var/www/powerdns-admin
 
@@ -51,7 +54,7 @@ RUN set -ex; \
 		/var/www/powerdns-admin/run_travis.sh \
 	; \
 	pip3 install --upgrade pip; \
-    pip3 install psycopg2; \
+	pip3 install psycopg2; \
 	pip3 install -r /var/www/powerdns-admin/requirements.txt
 
 COPY config_template.py generate_salt.py /var/www/powerdns-admin/
@@ -62,5 +65,48 @@ RUN set -ex; \
 
 EXPOSE 9191
 
+ENV FLASK_APP=app/__init__.py \
+	GUNICORN_TIMEOUT=120 \
+	GUNICORN_WORKERS=4 \
+	GUNICORN_LOGLEVEL=info \
+	BIND_ADDRESS=0.0.0.0 \
+	PORT=9191 \
+	SECRET_KEY= \
+	TIMEOUT=10 \
+	LOG_LEVEL=INFO \
+	LOG_FILE= \
+	SALT= \
+	PDA_DB_USER=pdnsadmin \
+	PDA_DB_PASSWORD= \
+	PDA_DB_TYPE=postgresql \
+	PDA_DB_HOST= \
+	PDA_DB_PORT=5432 \
+	PDA_DB_NAME=pdnsadmin \
+	SQLALCHEMY_TRACK_MODIFICATIONS=True \
+	SAML_ENABLED=False \
+	SAML_DEBUG=False \
+	SAML_METADATA_URL= \
+	SAML_METADATA_CACHE_LIFETIME=1 \
+	SAML_IDP_SSO_BINDING= \
+	SAML_IDP_ENTITY_ID= \
+	SAML_NAMEID_FORMAT= \
+	SAML_ATTRIBUTE_EMAIL=email \
+	SAML_ATTRIBUTE_GIVENNAME=givenname \
+	SAML_ATTRIBUTE_SURNAME=surname \
+	SAML_ATTRIBUTE_NAME= \
+	SAML_ATTRIBUTE_USERNAME= \
+	SAML_ATTRIBUTE_ADMIN= \
+	SAML_ATTRIBUTE_GROUP= \
+	SAML_GROUP_ADMIN_NAME= \
+	SAML_GROUP_TO_ACCOUNT_MAPPING= \
+	SAML_ATTRIBUTE_ACCOUNT= \
+	SAML_SP_ENTITY_ID= \
+	SAML_SP_CONTACT_NAME= \
+	SAML_SP_CONTACT_MAIL= \
+	SAML_SIGN_REQUEST=False \
+	SAML_WANT_MESSAGE_SIGNED=True \
+	SAML_LOGOUT=False \
+	SAML_LOGOUT_URL=
+
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "-t 120", "-w 4", "--pythonpath=.", "-b 0.0.0.0:9191", "--log-level info", "app:app"]
+CMD ["gunicorn","app:app"]
