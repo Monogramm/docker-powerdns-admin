@@ -44,19 +44,21 @@ for latest in "${latests[@]}"; do
 			echo "generating $latest [$version]"
 			mkdir -p "$dir"
 
+			# Copy the scripts/config files
+			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
+				cp "docker-$name" "$dir/$name"
+				chmod 755 "$dir/$name"
+			done
+
 			template="Dockerfile-${base[$variant]}.template"
 			cp "$template" "$dir/Dockerfile"
+			cp ".dockerignore" "$dir/.dockerignore"
+			cp "docker-compose.yml" "$dir/docker-compose.yml"
 
 			# Replace the variables.
 			sed -ri -e '
 				s/%%VERSION%%/'"$latest"'/g;
 			' "$dir/Dockerfile"
-
-			# Copy the scripts/config files
-			for name in entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
-				cp "docker-$name" "$dir/$name"
-				chmod 755 "$dir/$name"
-			done
 
             travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant$travisEnv"
 
