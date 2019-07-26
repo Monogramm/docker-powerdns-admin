@@ -30,7 +30,9 @@ RUN set -ex; \
 	rm -rf /var/cache/apk/*
 
 WORKDIR /var/www/powerdns-admin
-ENV FLASK_APP=app/__init__.py
+ENV FLASK_APP=app/__init__.py \
+	BIND_ADDRESS=0.0.0.0 \
+	PORT=9191
 
 ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${VERSION}.zip /tmp/powerdns-admin.zip
 
