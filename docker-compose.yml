@@ -4,6 +4,7 @@ services:
   powerdns-admin:
     build: .
     image: powerdns-admin
+    hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M
     memswap_limit: 256M
@@ -38,9 +39,10 @@ services:
       - ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
       - ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
       - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
-      # PowerDNS configuration
-      - PDNS_HOST=${PDNS_HOST}
-      - PDNS_API_KEY=${PDNS_API_KEY}
+      # PowerDNS-Admin configuration
+      - PDNS_API_URL=http://${PDNS_HOST}:8081
+      - PDNS_API_KEY=${POWERDNS_API_KEY}
+      - SIGNUP_ENABLED=False
     # MySQL / MariaDB
     #depends_on:
     #  powerdns-admin-mysql:
@@ -63,10 +65,12 @@ services:
   #    - /etc/timezone:/etc/timezone:ro
   #  networks:
   #    - default
+  #  command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
   #  environment:
   #    - MYSQL_DATABASE=${PDA_DB_NAME}
   #    - MYSQL_USER=${PDA_DB_USER}
   #    - MYSQL_PASSWORD=${PDA_DB_PASSWORD}
+  #    - MYSQL_RANDOM_ROOT_PASSWORD=1
   #  healthcheck:
   #    test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
   #    timeout: 10s
@@ -92,18 +96,21 @@ services:
   pdns-server:
     image: psitrax/powerdns
     hostname: ${PDNS_HOST}
+    container_name: ${PDNS_HOST}
     ports:
       - "5053:53"
       - "5053:53/udp"
     networks:
       - default
-    command: --api=yes --api-key=${PDNS_API_KEY} --webserver-address=0.0.0.0 --webserver-allow-from=0.0.0.0/0
     environment:
       - MYSQL_HOST=${PDNS_DB_HOST}
       - MYSQL_USER=${PDNS_DB_USER}
       - MYSQL_PASS=${PDNS_DB_PASSWORD}
+      - PDNS_API=yes
       - PDNS_API_KEY=${PDNS_API_KEY}
-      - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}
+      - PDNS_WEBSERVER_ADDRESS=0.0.0.0
+      - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
+      - PDNS_SOA_REFRESH_DEFAULT=14400
     depends_on:
       pdns-mysql:
         condition: service_healthy
@@ -120,10 +127,12 @@ services:
       - powerdns-mysql-data:/var/lib/mysql
     networks:
       - default
+    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
     environment:
       - MYSQL_DATABASE=${PDNS_DB_NAME}
       - MYSQL_USER=${PDNS_DB_USER}
       - MYSQL_PASSWORD=${PDNS_DB_PASSWORD}
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 10s

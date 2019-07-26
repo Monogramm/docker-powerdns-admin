@@ -40,15 +40,15 @@ if [ ! -f config.py ]; then
   log "---> Creating default configuration"
   cp config_template.py config.py
 
-  # Generate random secret if not set in config
-  if grep 'We are the world' ./config.py; then
+  # Generate random secret if default present
+  if grep -q 'We are the world' ./config.py; then
     log "---> Generating random secret"
     SECRET_KEY=$(openssl rand -hex 64)
     sed -i "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" ./config.py
   fi
 
   # Generate random salt if default present
-  if grep '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./config.py; then
+  if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./config.py; then
     log "---> Generating random salt"
     SALT=$(python3 generate_salt.py)
     sed -i "s|'SALT', '.*'|'SALT', '${SALT}'|g" ./config.py
