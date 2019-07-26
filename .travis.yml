@@ -32,6 +32,10 @@ script:
 notifications:
   email: false
 
+matrix:
+  allow_failures:
+    - env: VERSION=v0.1 VARIANT=alpine
+
 env: # Environments
     - VERSION=master VARIANT=alpine
     - VERSION=v0.1 VARIANT=alpine
