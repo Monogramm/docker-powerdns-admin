@@ -16,7 +16,6 @@ services:
       - powerdns-admin-migrations:/var/www/powerdns-admin/migrations
       # SQLite only
       - powerdns-admin-db:/var/www/powerdns-admin/db
-      - powerdns-admin-assets:/var/www/powerdns-admin/app/static
     logging:
       driver: json-file
       options:
