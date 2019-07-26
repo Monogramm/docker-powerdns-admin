@@ -27,7 +27,7 @@ if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
     log "Database ($PDA_DB_HOST) is unavailable - sleeping"
     sleep 1
   done
-elif [ ! -f "./db/$PDA_DB_NAME.sqlite3" ]
+elif [ ! -f "./db/$PDA_DB_NAME.sqlite3" ]; then
   log "===> Initializing SQLite Database"
   touch "./db/$PDA_DB_NAME.sqlite3"
 fi
