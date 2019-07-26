@@ -14,7 +14,7 @@ services:
       - powerdns-admin-assets:/powerdns-admin/app/static
       - powerdns-admin-assets2:/powerdns-admin/node_modules
       - powerdns-admin-assets3:/powerdns-admin/logs
-      #- powerdns-admin-db:/powerdns-admin/db
+      - powerdns-admin-db:/powerdns-admin/db
       - ./app/static/custom:/powerdns-admin/app/static/custom
     logging:
       driver: json-file
@@ -134,6 +134,8 @@ networks:
 
 volumes:
   powerdns-mysql-data:
+  # SQLite
+  powerdns-admin-db:
   # MySQL / MariaDB
   #powerdns-admin-mysql-data:
   # PostgreSQL
