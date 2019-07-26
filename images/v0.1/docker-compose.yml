@@ -24,10 +24,11 @@ services:
       - default
     environment:
       # Database configuration
-      - PDA_DB_HOST=${PDA_DB_HOST}
       - PDA_DB_NAME=${PDA_DB_NAME}
       - PDA_DB_USER=${PDA_DB_USER}
       - PDA_DB_PASSWORD=${PDA_DB_PASSWORD}
+      - PDA_DB_TYPE=${PDA_DB_TYPE}
+      - PDA_DB_HOST=${PDA_DB_HOST}
       - PDA_DB_PORT=${PDA_DB_PORT}
       # Gunicorn configuration
       - PORT=${PDA_PORT}
@@ -40,9 +41,12 @@ services:
       # PowerDNS configuration
       - PDNS_HOST=${PDNS_HOST}
       - PDNS_API_KEY=${PDNS_API_KEY}
-    depends_on:
-      powerdns-admin-mysql:
-        condition: service_healthy
+    # MySQL / MariaDB
+    #depends_on:
+    #  powerdns-admin-mysql:
+    #    condition: service_healthy
+    # PostgreSQL
+    #depends_on: powerdns-admin-postgresql
 
   # MySQL / MariaDB
   #powerdns-admin-mysql:
