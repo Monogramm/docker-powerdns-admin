@@ -26,7 +26,8 @@ PowerDNS Admin is a PowerDNS web interface with monitoring and administration fe
 
 https://hub.docker.com/r/monogramm/docker-powerdns-admin/
 
-* `master`
+* `master` `latest`
+* `0.1`
 
 ## How to run this image ?
 
