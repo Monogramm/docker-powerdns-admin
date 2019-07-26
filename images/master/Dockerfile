@@ -70,7 +70,12 @@ RUN set -ex; \
 		init_admin.py \
 		init_setting.py
 
-VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/db", ]		
+VOLUME [ \
+	"/var/www/powerdns-admin/upload", \
+	"/var/www/powerdns-admin/logs", \
+	"/var/www/powerdns-admin/migrations", \
+	"/var/www/powerdns-admin/db", \
+	]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","app:app"]

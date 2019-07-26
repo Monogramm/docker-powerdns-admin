@@ -13,7 +13,7 @@ services:
     volumes:
       - powerdns-admin-upload:/var/www/powerdns-admin/upload
       - powerdns-admin-logs:/var/www/powerdns-admin/logs
-      #- powerdns-admin-migrations:/var/www/powerdns-admin/migrations
+      - powerdns-admin-migrations:/var/www/powerdns-admin/migrations
       # SQLite only
       - powerdns-admin-db:/var/www/powerdns-admin/db
       - powerdns-admin-assets:/var/www/powerdns-admin/app/static
@@ -32,6 +32,7 @@ services:
       - PDA_DB_HOST=${PDA_DB_HOST}
       - PDA_DB_PORT=${PDA_DB_PORT}
       # Gunicorn configuration
+      - BIND_ADDRESS=0.0.0.0
       - PORT=${PDA_PORT}
       # Admin user
       - ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
@@ -143,10 +144,9 @@ networks:
 
 volumes:
   powerdns-mysql-data:
-  powerdns-admin-assets:
   powerdns-admin-upload:
   powerdns-admin-logs:
-  #powerdns-admin-migrations:
+  powerdns-admin-migrations:
   # SQLite
   powerdns-admin-db:
   # MySQL / MariaDB
