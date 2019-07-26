@@ -28,6 +28,12 @@ script:
   - docker-compose ps
   - docker-compose logs
   - docker-compose ps "$name" | grep "Up"
+  - docker-compose down
+  - travis_retry docker-compose up -d && sleep 60
+  - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
+  - docker-compose ps
+  - docker-compose logs
+  - docker-compose ps "$name" | grep "Up"
 
 notifications:
   email: false
