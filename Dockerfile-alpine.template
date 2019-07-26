@@ -57,13 +57,14 @@ RUN set -ex; \
 	pip3 install psycopg2; \
 	pip3 install -r /var/www/powerdns-admin/requirements.txt
 
-COPY config_template.py generate_salt.py init_setting.py /var/www/powerdns-admin/
+COPY config_template.py generate_salt.py init_admin.py init_setting.py /var/www/powerdns-admin/
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
 	chmod 755 \
 		/entrypoint.sh\
 		generate_salt.py \
+		init_admin.py \
 		init_setting.py
 		
 

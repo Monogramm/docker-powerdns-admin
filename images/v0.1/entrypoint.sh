@@ -66,6 +66,8 @@ if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   echo "---> Running data init"
   ./init_data.py
   echo "---> Running settings init"
+  ./init_admin.py
+  echo "---> Running settings init"
   ./init_setting.py
 
 else

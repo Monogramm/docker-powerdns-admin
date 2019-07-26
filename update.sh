@@ -53,7 +53,7 @@ for latest in "${latests[@]}"; do
 			' "$dir/Dockerfile"
 
 			# Copy the scripts/config files
-			for name in entrypoint.sh config_template.py generate_salt.py init_setting.py; do
+			for name in entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
 				cp "docker-$name" "$dir/$name"
 				chmod 755 "$dir/$name"
 			done
