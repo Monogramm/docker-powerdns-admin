@@ -18,7 +18,7 @@ fi
 
 
 # Wait for us to be able to connect to DB before proceeding
-if [ "${SQLA_DB_TYPE}" != "sqlite" ]; then
+if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
   log "===> Waiting for $PDA_DB_HOST Database service"
   until nc -zv \
     $PDA_DB_HOST \

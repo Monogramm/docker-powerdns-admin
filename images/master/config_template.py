@@ -26,11 +26,13 @@ SQLA_DB_HOST = os.environ.get('PDA_DB_HOST', 'postgresql')
 SQLA_DB_PORT = os.environ.get('PDA_DB_PORT', 5432 )
 SQLA_DB_NAME = os.environ.get('PDA_DB_NAME', 'pdnsadmin')
 
+dbdir = os.path.join(basedir, 'db')
+
 SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'True').lower() == 'true'
 
 # DATABASE
 if SQLA_DB_TYPE == 'sqlite':
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'pdnsadmin.sqlite3')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(dbdir, SQLA_DB_NAME+'.sqlite3')
 else:
     SQLALCHEMY_DATABASE_URI = SQLA_DB_TYPE+'://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_DB_HOST+':'+str(SQLA_DB_PORT)+'/'+SQLA_DB_NAME
 
