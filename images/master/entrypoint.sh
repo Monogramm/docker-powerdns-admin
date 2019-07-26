@@ -67,8 +67,6 @@ if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
-  echo "---> Running data init"
-  ./init_data.py
   echo "---> Running settings init"
   ./init_admin.py
   echo "---> Running settings init"
