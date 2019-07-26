@@ -11,11 +11,11 @@ services:
       - "9191:${PDA_PORT}"
     volumes:
       # Assets dir volume
-      - powerdns-admin-assets:/powerdns-admin/app/static
-      - powerdns-admin-assets2:/powerdns-admin/node_modules
-      - powerdns-admin-assets3:/powerdns-admin/logs
-      - powerdns-admin-db:/powerdns-admin/db
-      - ./app/static/custom:/powerdns-admin/app/static/custom
+      - powerdns-admin-assets:/var/www/powerdns-admin/app/static
+      - powerdns-admin-assets2:/var/www/powerdns-admin/node_modules
+      - powerdns-admin-assets3:/var/www/powerdns-admin/logs
+      - powerdns-admin-db:/var/www/powerdns-admin/db
+      - ./app/static/custom:/var/www/powerdns-admin/app/static/custom
     logging:
       driver: json-file
       options:
