@@ -47,7 +47,6 @@ RUN set -ex; \
 	rm -rf \
 		/var/www/powerdns-admin/config/ \
 		/var/www/powerdns-admin/docker/ \
-		/var/www/powerdns-admin/migrations/ \
 		/var/www/powerdns-admin/tests/ \
 		/var/www/powerdns-admin/.env \
 		/var/www/powerdns-admin/.travis.yml \

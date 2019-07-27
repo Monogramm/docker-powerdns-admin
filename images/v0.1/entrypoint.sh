@@ -8,6 +8,10 @@ log() {
 # == Vars
 #
 DB_MIGRATION_DIR=./db/migrations
+if [ -d "./migrations" ];
+ then mv -f "./migrations" "./db/"
+fi
+
 if [[ -z ${PDNS_PROTO} ]];
  then PDNS_PROTO="http"
 fi
@@ -60,19 +64,16 @@ fi
 log "===> Database management"
 if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
 
-  log "---> Running DB Init"
-  flask db init --directory ${DB_MIGRATION_DIR}
   log "---> Running DB Migration"
   set +e
-  flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
-  # FIXME Fails on MySQL but not on others DB
-  # sqlalchemy.exc.IntegrityError: (_mysql_exceptions.IntegrityError) (1452, 'Cannot add or update a child row: a foreign key constraint fails (`pdnsadmin`.`user`, CONSTRAINT `user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`))')
-  log "---> Initializing admin user"
-  ./init_admin.py
+
   log "---> Initializing settings"
   ./init_setting.py
+
+  log "---> Initializing admin user"
+  ./init_admin.py
 
 else
 

@@ -34,19 +34,19 @@ services:
       # Gunicorn configuration
       - BIND_ADDRESS=0.0.0.0
       - PORT=${PDA_PORT}
-      # FIXME Admin user (fails only on MySQL)
-      #- ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
-      #- ADMIN_PASSWORD=${PDA_ADMIN_PASSWORD}
-      #- ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
-      #- ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
-      #- ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
+      # Admin user
+      - ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${PDA_ADMIN_PASSWORD}
+      - ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
+      - ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
+      - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
       - PDNS_PROTO=${PDNS_PROTO}
       - PDNS_HOST=${PDNS_HOST}
       - PDNS_PORT=${PDNS_PORT}
       - PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
-      #- SIGNUP_ENABLED=False
+      - SIGNUP_ENABLED=False
     # MySQL / MariaDB
     depends_on:
       powerdns-admin-mysql:
