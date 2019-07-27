@@ -52,8 +52,6 @@ services:
     hostname: ${PDA_DB_HOST}
     container_name: ${PDA_DB_HOST}
     restart: always
-    ports:
-      - 5432:5432
     volumes:
       - powerdns-admin-postgresql-data:/var/lib/postgresql/data
       - /etc/localtime:/etc/localtime:ro
@@ -94,8 +92,6 @@ services:
     hostname: ${PDNS_DB_HOST}
     container_name: ${PDNS_DB_HOST}
     restart: always
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_DB=${PDNS_DB_NAME}
       - POSTGRES_USER=${PDNS_DB_USER}

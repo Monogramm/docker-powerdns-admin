@@ -32,12 +32,12 @@ services:
       # Gunicorn configuration
       - BIND_ADDRESS=0.0.0.0
       - PORT=${PDA_PORT}
-      # Admin user
-      - ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
-      - ADMIN_PASSWORD=${PDA_ADMIN_PASSWORD}
-      - ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
-      - ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
-      - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
+      # FIXME Admin user (fails only on MySQL)
+      #- ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
+      #- ADMIN_PASSWORD=${PDA_ADMIN_PASSWORD}
+      #- ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
+      #- ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
+      #- ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
       - PDNS_API_URL=http://${PDNS_HOST}:8081/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
