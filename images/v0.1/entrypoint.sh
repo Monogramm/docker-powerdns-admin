@@ -1,23 +1,26 @@
 #!/usr/bin/env sh
 set -e
 
+# == Functions
+#
 log() {
   echo "[$(date +%Y-%m-%dT%H:%M:%S%:z)] $@"
 }
 
 # == Vars
 #
+if [ ! -d ./db/migrations ] || [ ./migrations -nt ./db/migrations ]; then
+  log "===> Preparing Database migrations"
+  cp -rf ./migrations ./db/
+fi
 DB_MIGRATION_DIR=./db/migrations
-if [ -d "./migrations" ];
- then mv -f "./migrations" "./db/"
+
+if [[ -z ${PDNS_PROTO} ]]; then
+  PDNS_PROTO="http"
 fi
 
-if [[ -z ${PDNS_PROTO} ]];
- then PDNS_PROTO="http"
-fi
-
-if [[ -z ${PDNS_PORT} ]];
- then PDNS_PORT=8081
+if [[ -z ${PDNS_PORT} ]]; then
+  PDNS_PORT=8081
 fi
 
 
