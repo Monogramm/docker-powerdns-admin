@@ -53,7 +53,9 @@ for latest in "${latests[@]}"; do
 			template="Dockerfile-${base[$variant]}.template"
 			cp "$template" "$dir/Dockerfile"
 			cp ".dockerignore" "$dir/.dockerignore"
-			cp "docker-compose.yml" "$dir/docker-compose.yml"
+			cp "docker-compose_mysql.yml" "$dir/docker-compose_mysql.yml"
+			cp "docker-compose_postgres.yml" "$dir/docker-compose_postgres.yml"
+			cp "docker-compose_sqlite.yml" "$dir/docker-compose_sqlite.yml"
 
 			# Replace the variables.
 			sed -ri -e '

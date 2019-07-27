@@ -18,29 +18,31 @@ before_script:
 script:
   #- travis_retry docker build -t "$image" "$dir"
   - cd "$dir"
-  - travis_retry travis_wait 60 docker-compose build
+  - travis_retry travis_wait 60 docker-compose build -f docker-compose_$COMPOSE.yml
   - docker images
-  - travis_retry docker-compose up -d && sleep 60
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
+  - travis_retry docker-compose up -d -f docker-compose_$COMPOSE.yml && sleep 60
+  - docker-compose ps -f docker-compose_$COMPOSE.yml
+  - docker-compose logs -f docker-compose_$COMPOSE.yml
+  - docker-compose ps -f docker-compose_$COMPOSE.yml "$name" | grep "Up"
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
-  - docker-compose down
-  - travis_retry docker-compose up -d && sleep 60
+  - docker-compose ps -f docker-compose_$COMPOSE.yml
+  - docker-compose logs -f docker-compose_$COMPOSE.yml
+  - docker-compose ps -f docker-compose_$COMPOSE.yml "$name" | grep "Up"
+  - docker-compose down -f docker-compose_$COMPOSE.yml
+  - travis_retry docker-compose up -d -f docker-compose_$COMPOSE.yml && sleep 60
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
+  - docker-compose ps -f docker-compose_$COMPOSE.yml
+  - docker-compose logs -f docker-compose_$COMPOSE.yml
+  - docker-compose ps -f docker-compose_$COMPOSE.yml "$name" | grep "Up"
 
 notifications:
   email: false
 
 matrix:
   allow_failures:
-    - env: VERSION=v0.1 VARIANT=alpine
+    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=mysql
+    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=postgres
+    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=sqlite
 
 env: # Environments
     - VERSION=master VARIANT=alpine

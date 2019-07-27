@@ -1,0 +1,137 @@
+version: "2.1"
+
+services:
+  powerdns-admin:
+    build: .
+    image: powerdns-admin
+    hostname: powerdns-admin
+    container_name: powerdns-admin
+    mem_limit: 256M
+    memswap_limit: 256M
+    ports:
+      - "9191:${PDA_PORT}"
+    volumes:
+      - powerdns-admin-upload:/var/www/powerdns-admin/upload
+      - powerdns-admin-logs:/var/www/powerdns-admin/logs
+      - powerdns-admin-db:/var/www/powerdns-admin/db
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    networks:
+      - default
+    environment:
+      # Database configuration
+      - PDA_DB_NAME=${PDA_DB_NAME}
+      - PDA_DB_USER=${PDA_DB_USER}
+      - PDA_DB_PASSWORD=${PDA_DB_PASSWORD}
+      # MySQL / MariaDB
+      - PDA_DB_TYPE=mysql
+      - PDA_DB_HOST=${PDA_DB_HOST}
+      - PDA_DB_PORT=3306
+      # Gunicorn configuration
+      - BIND_ADDRESS=0.0.0.0
+      - PORT=${PDA_PORT}
+      # Admin user
+      - ADMIN_USERNAME=${PDA_ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${PDA_ADMIN_PASSWORD}
+      - ADMIN_FIRSTNAME=${PDA_ADMIN_FIRSTNAME}
+      - ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
+      - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
+      # PowerDNS-Admin configuration
+      - PDNS_API_URL=http://${PDNS_HOST}:8081
+      - PDNS_API_KEY=${PDNS_API_KEY}
+      - SIGNUP_ENABLED=False
+    # MySQL / MariaDB
+    depends_on:
+      powerdns-admin-mysql:
+        condition: service_healthy
+
+  # MySQL / MariaDB
+  powerdns-admin-mysql:
+    image: mysql/mysql-server:5.7
+    hostname: ${PDA_DB_HOST}
+    container_name: ${PDA_DB_HOST}
+    mem_limit: 256M
+    memswap_limit: 256M
+    expose:
+      - 3306
+    volumes:
+      - powerdns-admin-mysql-data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - default
+    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+    environment:
+      - MYSQL_DATABASE=${PDA_DB_NAME}
+      - MYSQL_USER=${PDA_DB_USER}
+      - MYSQL_PASSWORD=${PDA_DB_PASSWORD}
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  pdns-server:
+    image: monogramm/docker-powerdns:develop
+    hostname: ${PDNS_HOST}
+    container_name: ${PDNS_HOST}
+    ports:
+      - "5053:53"
+      - "5053:53/udp"
+    networks:
+      - default
+    environment:
+      - AUTOCONF=mysql
+      # MySQL / MariaDB
+      - MYSQL_HOST=${PDNS_DB_HOST}
+      - MYSQL_PORT=3306
+      - MYSQL_DB=${PDA_DB_NAME}
+      - MYSQL_USER=${PDNS_DB_USER}
+      - MYSQL_PASS=${PDNS_DB_PASSWORD}
+      - MYSQL_DNSSEC=no
+      - PDNS_API=yes
+      - PDNS_API_KEY=${PDNS_API_KEY}
+      - PDNS_WEBSERVER_ADDRESS=0.0.0.0
+      - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
+      - PDNS_SOA_REFRESH_DEFAULT=14400
+    depends_on:
+      pdns-mysql:
+        condition: service_healthy
+
+  pdns-mysql:
+    image: mysql/mysql-server:5.7
+    hostname: ${PDNS_DB_HOST}
+    container_name: ${PDNS_DB_HOST}
+    mem_limit: 256M
+    memswap_limit: 256M
+    expose:
+      - 3306
+    volumes:
+      - powerdns-mysql-data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - default
+    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+    environment:
+      - MYSQL_DATABASE=${PDNS_DB_NAME}
+      - MYSQL_USER=${PDNS_DB_USER}
+      - MYSQL_PASSWORD=${PDNS_DB_PASSWORD}
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+networks:
+  default:
+
+volumes:
+  powerdns-admin-upload:
+  powerdns-admin-logs:
+  powerdns-admin-db:
+  # MySQL / MariaDB
+  powerdns-admin-mysql-data:
+  powerdns-mysql-data:
