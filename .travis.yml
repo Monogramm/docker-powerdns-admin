@@ -45,5 +45,9 @@ matrix:
     - env: VERSION=v0.1 VARIANT=alpine COMPOSE=sqlite
 
 env: # Environments
-    - VERSION=master VARIANT=alpine
-    - VERSION=v0.1 VARIANT=alpine
+    - VERSION=master VARIANT=alpine COMPOSE=sqlite
+    - VERSION=master VARIANT=alpine COMPOSE=postgres
+    - VERSION=master VARIANT=alpine COMPOSE=mysql
+    - VERSION=v0.1 VARIANT=alpine COMPOSE=sqlite
+    - VERSION=v0.1 VARIANT=alpine COMPOSE=postgres
+    - VERSION=v0.1 VARIANT=alpine COMPOSE=mysql

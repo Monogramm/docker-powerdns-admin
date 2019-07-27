@@ -39,7 +39,7 @@ services:
       - ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
       - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
-      - PDNS_API_URL=http://${PDNS_HOST}:8081
+      - PDNS_API_URL=http://${PDNS_HOST}:8081/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
       - SIGNUP_ENABLED=False
     # MySQL / MariaDB

@@ -62,7 +62,9 @@ for latest in "${latests[@]}"; do
 				s/%%VERSION%%/'"$latest"'/g;
 			' "$dir/Dockerfile"
 
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=mysql'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=postgres'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=sqlite'"$travisEnv"
 
 			if [[ $1 == 'build' ]]; then
 				tag="$version"
