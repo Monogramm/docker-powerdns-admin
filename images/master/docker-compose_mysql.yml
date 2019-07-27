@@ -87,7 +87,7 @@ services:
       # MySQL / MariaDB
       - MYSQL_HOST=${PDNS_DB_HOST}
       - MYSQL_PORT=3306
-      - MYSQL_DB=${PDA_DB_NAME}
+      - MYSQL_DB=${PDNS_DB_NAME}
       - MYSQL_USER=${PDNS_DB_USER}
       - MYSQL_PASS=${PDNS_DB_PASSWORD}
       - MYSQL_DNSSEC=no

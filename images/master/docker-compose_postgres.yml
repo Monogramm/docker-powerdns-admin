@@ -77,7 +77,7 @@ services:
       # PostgreSQL
       - PGSQL_HOST=${PDNS_DB_HOST}
       - PGSQL_PORT=5432
-      - PGSQL_DB=${PDA_DB_NAME}
+      - PGSQL_DB=${PDNS_DB_NAME}
       - PGSQL_USER=${PDNS_DB_USER}
       - PGSQL_PASS=${PDNS_DB_PASSWORD}
       - PGSQL_DNSSEC=no
