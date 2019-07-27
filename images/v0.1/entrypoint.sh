@@ -69,9 +69,9 @@ if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   set -e
   # FIXME Fails on MySQL but not on others DB
   # sqlalchemy.exc.IntegrityError: (_mysql_exceptions.IntegrityError) (1452, 'Cannot add or update a child row: a foreign key constraint fails (`pdnsadmin`.`user`, CONSTRAINT `user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`))')
-  log "---> Running settings init"
+  log "---> Initializing admin user"
   ./init_admin.py
-  log "---> Running settings init"
+  log "---> Initializing settings"
   ./init_setting.py
 
 else

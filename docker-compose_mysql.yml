@@ -14,6 +14,8 @@ services:
       - powerdns-admin-upload:/var/www/powerdns-admin/upload
       - powerdns-admin-logs:/var/www/powerdns-admin/logs
       - powerdns-admin-db:/var/www/powerdns-admin/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     logging:
       driver: json-file
       options:
@@ -39,9 +41,12 @@ services:
       #- ADMIN_LASTNAME=${PDA_ADMIN_LASTNAME}
       #- ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
-      - PDNS_API_URL=http://${PDNS_HOST}:8081/api/v1
+      - PDNS_PROTO=${PDNS_PROTO}
+      - PDNS_HOST=${PDNS_HOST}
+      - PDNS_PORT=${PDNS_PORT}
+      - PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
-      - SIGNUP_ENABLED=False
+      #- SIGNUP_ENABLED=False
     # MySQL / MariaDB
     depends_on:
       powerdns-admin-mysql:
@@ -82,6 +87,9 @@ services:
       - "5053:53/udp"
     networks:
       - default
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - AUTOCONF=mysql
       # MySQL / MariaDB
@@ -94,6 +102,7 @@ services:
       - PDNS_API=yes
       - PDNS_API_KEY=${PDNS_API_KEY}
       - PDNS_WEBSERVER_ADDRESS=0.0.0.0
+      - PDNS_WEBSERVER_PORT=${PDNS_PORT}
       - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
       - PDNS_SOA_REFRESH_DEFAULT=14400
     depends_on:
