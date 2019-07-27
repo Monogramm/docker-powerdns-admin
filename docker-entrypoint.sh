@@ -7,7 +7,7 @@ log() {
 
 # == Vars
 #
-DB_MIGRATION_DIR=./migrations
+DB_MIGRATION_DIR=./db/migrations
 if [[ -z ${PDNS_PROTO} ]];
  then PDNS_PROTO="http"
 fi

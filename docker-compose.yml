@@ -13,8 +13,6 @@ services:
     volumes:
       - powerdns-admin-upload:/var/www/powerdns-admin/upload
       - powerdns-admin-logs:/var/www/powerdns-admin/logs
-      - powerdns-admin-migrations:/var/www/powerdns-admin/migrations
-      # SQLite only
       - powerdns-admin-db:/var/www/powerdns-admin/db
     logging:
       driver: json-file
@@ -145,8 +143,6 @@ volumes:
   powerdns-mysql-data:
   powerdns-admin-upload:
   powerdns-admin-logs:
-  powerdns-admin-migrations:
-  # SQLite
   powerdns-admin-db:
   # MySQL / MariaDB
   #powerdns-admin-mysql-data:
