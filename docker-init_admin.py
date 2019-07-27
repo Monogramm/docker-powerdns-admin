@@ -7,7 +7,7 @@ from app.models import User
 
 
 # Admin user
-if os.environ.get('ADMIN_PASSWORD'):
+if os.environ.get('ADMIN_PASSWORD') != None:
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
     ADMIN_FIRSTNAME = os.environ.get('ADMIN_FIRSTNAME')

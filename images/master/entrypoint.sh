@@ -1,19 +1,26 @@
 #!/usr/bin/env sh
 set -e
 
+# == Functions
+#
 log() {
   echo "[$(date +%Y-%m-%dT%H:%M:%S%:z)] $@"
 }
 
 # == Vars
 #
+if [ ! -d ./db/migrations ] || [ ./migrations -nt ./db/migrations ]; then
+  log "===> Preparing Database migrations"
+  cp -rf ./migrations ./db/
+fi
 DB_MIGRATION_DIR=./db/migrations
-if [[ -z ${PDNS_PROTO} ]];
- then PDNS_PROTO="http"
+
+if [[ -z ${PDNS_PROTO} ]]; then
+  PDNS_PROTO="http"
 fi
 
-if [[ -z ${PDNS_PORT} ]];
- then PDNS_PORT=8081
+if [[ -z ${PDNS_PORT} ]]; then
+  PDNS_PORT=8081
 fi
 
 
@@ -60,17 +67,16 @@ fi
 log "===> Database management"
 if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
 
-  log "---> Running DB Init"
-  flask db init --directory ${DB_MIGRATION_DIR}
   log "---> Running DB Migration"
   set +e
-  flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
-  echo "---> Running settings init"
-  ./init_admin.py
-  echo "---> Running settings init"
+
+  log "---> Initializing settings"
   ./init_setting.py
+
+  log "---> Initializing admin user"
+  ./init_admin.py
 
 else
 
