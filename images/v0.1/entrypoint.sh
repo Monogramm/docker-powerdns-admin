@@ -15,11 +15,11 @@ if [ ! -d ./db/migrations ] || [ ./migrations -nt ./db/migrations ]; then
 fi
 DB_MIGRATION_DIR=./db/migrations
 
-if [[ -z ${PDNS_PROTO} ]]; then
+if [[ -z "${PDNS_PROTO}" ]]; then
   PDNS_PROTO="http"
 fi
 
-if [[ -z ${PDNS_PORT} ]]; then
+if [[ -z "${PDNS_PORT}" ]]; then
   PDNS_PORT=8081
 fi
 
