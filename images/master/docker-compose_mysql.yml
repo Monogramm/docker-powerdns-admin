@@ -49,7 +49,7 @@ services:
 
   # MySQL / MariaDB
   powerdns-admin-mysql:
-    image: mysql/mysql-server:5.7
+    image: mariadb:10.3
     hostname: ${PDA_DB_HOST}
     container_name: ${PDA_DB_HOST}
     mem_limit: 256M
@@ -70,7 +70,7 @@ services:
       - MYSQL_RANDOM_ROOT_PASSWORD=1
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 10s
+      timeout: 30s
       retries: 5
 
   pdns-server:
@@ -101,7 +101,7 @@ services:
         condition: service_healthy
 
   pdns-mysql:
-    image: mysql/mysql-server:5.7
+    image: mariadb:10.3
     hostname: ${PDNS_DB_HOST}
     container_name: ${PDNS_DB_HOST}
     mem_limit: 256M
