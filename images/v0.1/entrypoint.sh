@@ -15,12 +15,20 @@ if [ ! -d ./db/migrations ] || [ ./migrations -nt ./db/migrations ]; then
 fi
 DB_MIGRATION_DIR=./db/migrations
 
+mkdir -p ./upload/avatar
+
 if [[ -z "${PDNS_PROTO}" ]]; then
   PDNS_PROTO="http"
 fi
 
 if [[ -z "${PDNS_PORT}" ]]; then
   PDNS_PORT=8081
+fi
+
+
+if [[ -n "${PDNS_HOST}" ]] && [[ -z ${PDNS_API_URL} ]]; then
+  log "===> Update PDNS API connection info"
+  PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
 fi
 
 
@@ -65,7 +73,7 @@ fi
 
 
 log "===> Database management"
-if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
+if [ ! -f "./db/.docker-db-init" ]; then
 
   log "---> Running DB Migration"
   set +e
@@ -75,8 +83,12 @@ if [ ! -f "${DB_MIGRATION_DIR}/README" ]; then
   log "---> Initializing settings"
   ./init_setting.py
 
-  log "---> Initializing admin user"
-  ./init_admin.py
+  if [[ -n "${ADMIN_USERNAME}" ]] && [[ -n "${ADMIN_PASSWORD}" ]] && [[ -n "${ADMIN_EMAIL}" ]]; then
+    log "---> Initializing admin user"
+    ./init_admin.py
+  fi
+
+  touch ./db/.docker-db-init
 
 else
 
@@ -86,8 +98,6 @@ else
   set -e
 
 fi
-
-#echo "===> (TODO) Update PDNS API connection info"
 
 
 log "===> Assets management"
@@ -116,7 +126,7 @@ if [ -n  "${GUNICORN_KEYFILE}" ]; then
 fi
 
 if [ "$1" == "gunicorn" ]; then
-    exec "$@" $GUNICORN_ARGS
+  exec "$@" $GUNICORN_ARGS
 else
-    exec "$@"
+  exec "$@"
 fi
