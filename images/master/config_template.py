@@ -11,8 +11,10 @@ PORT = int(os.environ.get('PORT', 9191))
 TIMEOUT = int(os.environ.get('TIMEOUT', 10))
 
 # LOG CONFIG
+logdir = os.path.join(basedir, 'logs')
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
-LOG_FILE = os.environ.get('LOG_FILE', 'logfile.log')
+LOG_FILE = os.path.join(logdir, os.environ.get('LOG_FILE', 'logfile.log'))
+
 SALT = os.environ.get('SALT', '$2b$12$yLUMTIfl21FKJQpTkRQXCu')
 
 # UPLOAD DIRECTORY
