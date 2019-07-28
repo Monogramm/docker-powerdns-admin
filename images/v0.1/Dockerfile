@@ -43,23 +43,22 @@ RUN set -ex; \
 	mkdir -p /usr/src/powerdns-admin; \
 	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
-	cp -r /usr/src/powerdns-admin/* /var/www/powerdns-admin/; \
+	cp -r /usr/src/powerdns-admin/* .; \
 	rm -rf \
-		/var/www/powerdns-admin/config/ \
-		/var/www/powerdns-admin/docker/ \
-		/var/www/powerdns-admin/tests/ \
-		/var/www/powerdns-admin/.env \
-		/var/www/powerdns-admin/.travis.yml \
-		/var/www/powerdns-admin/config_template.py \
-		/var/www/powerdns-admin/docker-compose*.yml \
-		/var/www/powerdns-admin/env-test \
-		/var/www/powerdns-admin/run_travis.sh \
+		./configs/ \
+		./docker/ \
+		./tests/ \
+		./.env \
+		./.travis.yml \
+		./config_template.py \
+		./docker-compose*.yml \
+		./env-test \
 	; \
 	pip3 install --upgrade pip; \
 	pip3 install psycopg2; \
-	pip3 install -r /var/www/powerdns-admin/requirements.txt
+	pip3 install -r ./requirements.txt
 
-COPY config_template.py generate_salt.py init_admin.py init_setting.py /var/www/powerdns-admin/
+COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
