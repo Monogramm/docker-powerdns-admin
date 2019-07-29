@@ -14,8 +14,6 @@ Docker image for PowerDNS Admin.
 
 Provides full database configuration, salt generation, configuration management, and so on...
 
-:construction: **This image is still in beta and should not be used in production (yet)!**
-
 ## What is PowerDNS Admin ?
 
 PowerDNS Admin is a PowerDNS web interface with monitoring and administration features.
@@ -27,14 +25,18 @@ PowerDNS Admin is a PowerDNS web interface with monitoring and administration fe
 https://hub.docker.com/r/monogramm/docker-powerdns-admin/
 
 * `master` `latest`
-* `0.1`
 
 ## How to run this image ?
 
-This image is based on the [officiel alpine repository](https://registry.hub.docker.com/_/alpine/).
+This image is based on the [official alpine repository](https://registry.hub.docker.com/_/alpine/).
 It is inspired from [PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) and [ixpict/powerdns-admin-pgsql](https://github.com/ixpict/powerdns-admin-pgsql).
 
 This image does not contain the database for PowerDNS Admin. You need to use either an existing database or a database container.
+
+You can use the sample docker-compose:
+* update the `image` fields by the `monogramm/docker-powerdns-admin:master`
+* create the `.env` with your properties
+* run `docker-compose up -d`
 
 ## Auto configuration via environment variables
 
@@ -100,17 +102,23 @@ Example:
 * Default
     ```
     PDNS_PROTO=http
+    PDNS_HOST=localhost
     PDNS_PORT=8081
     ```
 * SSL
     ```
     PDNS_PROTO=https
+    PDNS_HOST=powerdns
     PDNS_PORT=8081
+    ```
+* Manual (see **PowerDNS Admin settings**)
+    ```
+    PDNS_API_URL=https://powerdns:8081/api/v1
     ```
 
 ### PowerDNS Admin configuration
 
-Example:
+* Example:
     ```
     SECRET_KEY=somethingreallysecureornothingtogeneraterandomsecret
     TIMEOUT=5
@@ -123,7 +131,7 @@ Example:
 
 ### PowerDNS Admin SAML Authentication
 
-Disabled by default, SAML can be configured with the following properties:
+* Disabled by default, SAML can be configured with the following properties:
     ```
     SAML_ENABLED
     SAML_DEBUG
@@ -156,9 +164,10 @@ See `docker-config_template.py` for details.
 
 ### PowerDNS Admin user
 
-Disabled by default, you can enable creation of a default admin user by setting `ADMIN_PASSWORD`. The user will only be created for a new instance of PowerDNS Admin!
+Disabled by default, you can enable creation of a default admin user by setting `ADMIN_USERNAME`, `ADMIN_PASSWORD` and `ADMIN_EMAIL`.
+The user will only be created for a new instance of PowerDNS Admin!
 
-Example configuration:
+* Example configuration:
     ```
     ADMIN_USERNAME=admin
     ADMIN_PASSWORD=somethingverysecure
@@ -169,9 +178,10 @@ Example configuration:
 
 ### PowerDNS Admin settings
 
-The container can initialize its settings through environment variables. The settings will only be created for a new instance of PowerDNS Admin!
+The container can initialize its settings through environment variables.
+The settings will only be created for a new instance of PowerDNS Admin!
 
-Settings available:
+* Settings available:
     ```
     MAINTENANCE
     FULLSCREEN_LAYOUT
