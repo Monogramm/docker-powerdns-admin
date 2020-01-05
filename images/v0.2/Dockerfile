@@ -1,28 +1,38 @@
 FROM alpine
 
+ARG BUILD_DEPENDENCIES="build-base \
+    libffi-dev \
+    libxml2-dev \
+	libxslt-dev \
+	mariadb-dev \
+    mariadb-connector-c-dev \
+    openldap-dev \
+	openssl-dev \
+	postgresql-dev \
+    py3-pip \
+    python3-dev \
+    xmlsec-dev \
+    yarn"
+
 RUN set -ex; \
 	apk update; \
 	apk add --no-cache \
-		build-base \
 		curl \
-		libffi-dev \
-		libxslt-dev \
-		mariadb-dev \
+		mariadb-connector-c \
 		npm \
-		openldap-dev \
 		openssl \
-		openssl-dev \
-		postgresql-dev \
 		postgresql-libs \
 		py3-openssl \
+		py3-gunicorn \
+		py3-psycopg2 \
 		python3 \
-		python3-dev \
 		unzip \
-		xmlsec-dev \
-		yarn \
 	; \
 	mkdir -p /usr/src/; \
 	mkdir -p /var/www/powerdns-admin; \
+    addgroup -S pda;  \
+    adduser -S -D -G pda pda; \
+	chown -R pda:pda /var/www/powerdns-admin; \
 	rm -rf /var/cache/apk/*
 
 WORKDIR /var/www/powerdns-admin
@@ -80,8 +90,13 @@ RUN set -ex; \
 		./env-test \
 	; \
 	pip3 install --upgrade pip; \
-	pip3 install psycopg2; \
-	pip3 install -r ./requirements.txt
+	pip3 install -r ./requirements.txt; \
+	pip3 install pip-autoremove; \
+    pip3-autoremove cssmin -y; \
+    pip3-autoremove jsmin -y; \
+    pip3-autoremove pytest -y; \
+    pip3 uninstall -y pip-autoremove; \
+    apk del ${BUILD_DEPENDENCIES}
 
 COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
