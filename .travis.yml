@@ -23,7 +23,7 @@ script:
   #- travis_retry docker build -t "$image" "$dir"
   - cd "$dir"
   # Test containers build
-  - travis_retry travis_wait 60 docker-compose -f docker-compose.${DATABASE}.test.yml build
+  - docker-compose -f docker-compose.${DATABASE}.test.yml build
   - docker images
   # Test containers run
   - travis_retry docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
