@@ -7,11 +7,19 @@ COPY --chown=pda:pda config_template.py generate_salt.py init_admin.py init_sett
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
+	apk update; \
+	apk add --no-cache \
+		openldap-dev \
+		openssl \
+		openssl-dev \
+		py3-openssl \
+	; \
 	chmod 755 \
 		/entrypoint.sh\
 		./configs/generate_salt.py \
 		./configs/init_admin.py \
-		./configs/init_setting.py
+		./configs/init_setting.py \
+    ;
 
 VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
