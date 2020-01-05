@@ -28,6 +28,7 @@ RUN set -ex; \
 		python3 \
 		unzip \
 	; \
+	apk add --no-cache ${BUILD_DEPENDENCIES}; \
 	mkdir -p /usr/src/; \
 	mkdir -p /var/www/powerdns-admin; \
     addgroup -S pda;  \
