@@ -80,15 +80,15 @@ if [ ! -f "./db/.docker-db-init" ]; then
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
 
-  log "---> Initializing settings"
-  ./init_setting.py
+  log "---> [TODO] Initializing settings"
+  #./init_setting.py
 
   if [[ -n "${ADMIN_USERNAME}" ]] && [[ -n "${ADMIN_PASSWORD}" ]] && [[ -n "${ADMIN_EMAIL}" ]]; then
-    log "---> Initializing admin user"
-    ./init_admin.py
+    log "---> [TODO] Initializing admin user"
+    #./init_admin.py
   fi
 
-  touch ./db/.docker-db-init
+  #touch ./db/.docker-db-init
 
 else
 
