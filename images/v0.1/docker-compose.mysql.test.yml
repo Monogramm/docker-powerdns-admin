@@ -4,6 +4,7 @@ services:
   powerdns-admin:
     build: .
     image: powerdns-admin
+    #image: monogramm/docker-powerdns-admin:%%VERSION%%
     hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M
