@@ -52,8 +52,8 @@ fi
 log "===> Configuration management"
 
 if [ ! -f config.py ]; then
-  log "---> Creating default configuration"
-  cp config_template.py config.py
+  #log "---> Creating default configuration"
+  #cp config_template.py config.py
 
   # Generate random secret if default present
   if grep -q 'We are the world' ./config.py; then
