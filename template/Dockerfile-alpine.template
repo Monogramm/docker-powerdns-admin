@@ -32,12 +32,12 @@ RUN set -ex; \
 	apk add --no-cache ${BUILD_DEPENDENCIES}; \
 	ln -s /usr/bin/pip3 /usr/bin/pip
 
-WORKDIR /build
-
 ENV LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     FLASK_APP=/build/powerdnsadmin/__init__.py
+
+WORKDIR /build
 
 ARG VERSION=%%VERSION%%
 
@@ -47,10 +47,10 @@ RUN set -ex; \
 	mkdir -p /tmp/powerdns-admin; \
 	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
 	rm /tmp/powerdns-admin.zip; \
-	mkdir -p /usr/src/powerdnsadmin; \
-	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdnsadmin; \
+	mkdir -p /usr/src/powerdns-admin; \
+	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdns-admin; \
 	rm -rf /tmp/powerdns-admin; \
-	cp -r /usr/src/powerdnsadmin/* .; \
+	cp -r /usr/src/powerdns-admin/* .; \
 	rm -rf \
 		./configs/ \
 		./docker/ \
@@ -58,31 +58,30 @@ RUN set -ex; \
 		./.env \
 		./.travis.yml \
 		./docker-compose*.yml \
-	; \
+	;
+
+RUN set -ex; \
 	pip install --upgrade pip; \
 	pip install -r ./requirements.txt; \
 	yarn install --pure-lockfile --production; \
 	yarn cache clean; \
-	sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" /build/powerdnsadmin/assets.py; \
+	sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" ./powerdnsadmin/assets.py; \
 	flask assets build; \
-	mv /build/powerdnsadmin/static /tmp/static; \
-    mkdir /build/powerdnsadmin/static; \
-    cp -r /tmp/static/generated /build/powerdnsadmin/static; \
-    find /tmp/static/node_modules -name 'fonts' -exec cp -r {} /build/powerdnsadmin/static \;; \
-    find /tmp/static/node_modules/icheck/skins/square -name '*.png' -exec cp {} /build/powerdnsadmin/static/generated \;; \
-	{ \
-      echo "from flask_assets import Environment"; \
-      echo "assets = Environment()"; \
-      echo "assets.register('js_login', 'generated/login.js')"; \
-      echo "assets.register('js_validation', 'generated/validation.js')"; \
-      echo "assets.register('css_login', 'generated/login.css')"; \
-      echo "assets.register('js_main', 'generated/main.js')"; \
-      echo "assets.register('css_main', 'generated/main.css')"; \
-    } > /build/powerdnsadmin/assets.py; \
+	mv ./powerdnsadmin/static /tmp/static; \
+    mkdir ./powerdnsadmin/static; \
+    cp -r /tmp/static/generated ./powerdnsadmin/static; \
+    find /tmp/static/node_modules -name 'fonts' -exec cp -r {} ./powerdnsadmin/static \;; \
+    find /tmp/static/node_modules/icheck/skins/square -name '*.png' -exec cp {} ./powerdnsadmin/static/generated \;
+
+COPY assets.py ./powerdnsadmin/assets.py
+
+RUN set -ex; \
 	mkdir -p /app; \
-    cp -r /build/migrations/ /build/powerdnsadmin/ /build/run.py /app; \
+    cp -r ./migrations/ ./powerdnsadmin/ ./run.py /app; \
     mkdir -p /app/configs; \
-    cp -r /build/configs/docker_config.py /app/configs; \
+    cp -r ./configs/docker_config.py /app/configs
+
+RUN set -ex; \
 	pip install pip-autoremove; \
     pip-autoremove cssmin -y; \
     pip-autoremove jsmin -y; \
