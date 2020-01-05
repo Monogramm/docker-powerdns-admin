@@ -94,6 +94,7 @@ RUN set -ex; \
 		init_setting.py
 
 VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/migrations", "/var/www/powerdns-admin/db" ]
+HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","app:app"]
