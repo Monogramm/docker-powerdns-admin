@@ -11,7 +11,6 @@ RUN set -ex; \
 	apk add --no-cache \
 		openldap-dev \
 		openssl \
-		openssl-dev \
 		py3-openssl \
 	; \
 	chmod 755 \
