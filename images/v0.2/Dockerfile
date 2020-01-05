@@ -33,7 +33,7 @@ ENV FLASK_APP=app/__init__.py \
 # Arguments to label built container
 ARG VCS_REF
 ARG BUILD_DATE
-ARG VERSION=v0.2
+ARG VERSION=v0.2.1
 
 # Container labels (http://label-schema.org/)
 # Container annotations (https://github.com/opencontainers/image-spec)
