@@ -1,6 +1,19 @@
 version: "2.1"
 
 services:
+  # https://docs.docker.com/docker-hub/builds/automated-testing/
+  sut:
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    depends_on:
+      - powerdns-admin
+    volumes_from:
+      - powerdns-admin
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
   powerdns-admin:
     # For development or CI, tag build from local Dockerfile
     build:
