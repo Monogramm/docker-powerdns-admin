@@ -100,16 +100,6 @@ else
 fi
 
 
-log "===> Assets management"
-log "---> Running Yarn"
-yarn install --pure-lockfile
-# Fix for https://github.com/ngoduykhanh/PowerDNS-Admin/issues/310
-ln -sf "$(pwd)/node_modules" ./app/static/node_modules
-
-log "---> Running Flask assets"
-flask assets build
-
-
 log "===> Start gunicorn server"
 GUNICORN_TIMEOUT="${GUINCORN_TIMEOUT:-120}"
 GUNICORN_WORKERS="${GUNICORN_WORKERS:-4}"
