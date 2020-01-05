@@ -47,7 +47,7 @@ for latest in "${latests[@]}"; do
 			mkdir -p "$dir"
 
 			# Copy the scripts/config files
-			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
+			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py assets.py; do
 				cp "template/$name" "$dir/$name"
 				chmod 755 "$dir/$name"
 			done
@@ -57,9 +57,9 @@ for latest in "${latests[@]}"; do
 			cp "template/.dockerignore" "$dir/.dockerignore"
 			cp -r "template/hooks" "$dir/"
 			cp -r "template/test" "$dir/"
-			cp "template/docker-compose.mysql.yml" "$dir/docker-compose.mysql.test.yml"
-			cp "template/docker-compose.postgres.yml" "$dir/docker-compose.postgres.test.yml"
-			cp "template/docker-compose.sqlite.yml" "$dir/docker-compose.sqlite.test.yml"
+			cp "template/docker-compose.mysql.test.yml" "$dir/docker-compose.mysql.test.yml"
+			cp "template/docker-compose.postgres.test.yml" "$dir/docker-compose.postgres.test.yml"
+			cp "template/docker-compose.sqlite.test.yml" "$dir/docker-compose.sqlite.test.yml"
 
 			# Replace the variables.
 			sed -ri -e '
