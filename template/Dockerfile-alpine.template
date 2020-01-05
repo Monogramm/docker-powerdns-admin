@@ -9,9 +9,9 @@ COPY entrypoint.sh /entrypoint.sh
 RUN set -ex; \
 	chmod 755 \
 		/entrypoint.sh\
-		generate_salt.py \
-		init_admin.py \
-		init_setting.py
+		./configs/generate_salt.py \
+		./configs/init_admin.py \
+		./configs/init_setting.py
 
 VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]

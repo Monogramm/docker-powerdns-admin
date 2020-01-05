@@ -8,11 +8,18 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - powerdns-admin
+      - powerdns-admin-postgresql
+      - pdns-server
+      - pdns-postgresql
     volumes_from:
       - powerdns-admin
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      environment:
+        # PowerDNS-Server address
+        - PDNS_HOST=${PDNS_HOST}
+        - PDNS_PORT=${PDNS_PORT}
 
   powerdns-admin:
     # For development or CI, tag build from local Dockerfile
@@ -115,6 +122,7 @@ services:
       - PDNS_WEBSERVER_PORT=${PDNS_PORT}
       - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
       - PDNS_SOA_REFRESH_DEFAULT=14400
+    # PostgreSQL
     depends_on:
       - pdns-postgresql
 

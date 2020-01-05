@@ -6,7 +6,7 @@ echo "Waiting to ensure everything is fully ready for the tests..."
 sleep 60
 
 echo "Checking main containers are reachable..."
-if ! ping -c 10 -q pdns-server ; then
+if ! ping -c 10 -q ${PDNS_HOST} ; then
     echo 'PowerDNS Server container is not responding!'
     # TODO Display logs to help bug fixing
     #echo 'Check the following logs for details:'

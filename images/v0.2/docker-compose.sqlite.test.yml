@@ -8,11 +8,16 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - powerdns-admin
+      - pdns-server
     volumes_from:
       - powerdns-admin
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      environment:
+        # PowerDNS-Server address
+        - PDNS_HOST=${PDNS_HOST}
+        - PDNS_PORT=${PDNS_PORT}
 
   powerdns-admin:
     # For development or CI, tag build from local Dockerfile
@@ -30,6 +35,8 @@ services:
     container_name: powerdns-admin
     mem_limit: 256M
     memswap_limit: 256M
+    depends_on:
+      - pdns-server
     ports:
       - "9191:${PDA_PORT}"
     volumes:
