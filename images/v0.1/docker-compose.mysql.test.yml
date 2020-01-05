@@ -8,11 +8,11 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - powerdns-admin
-    volumes_from:
-      - powerdns-admin
       - powerdns-admin-mysql
       - pdns-server
       - pdns-mysql
+    volumes_from:
+      - powerdns-admin
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -26,8 +26,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      args: 
-        - TAG=${TAG}
+      args:
         - VCS_REF=${VCS_REF}
         - BUILD_DATE=${BUILD_DATE}
     image: powerdns-admin
