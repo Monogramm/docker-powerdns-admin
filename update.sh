@@ -52,7 +52,7 @@ for latest in "${latests[@]}"; do
 			mkdir -p "$dir"
 
 			# Copy the scripts/config files
-			for name in .env entrypoint.sh docker_config.py generate_salt.py init_admin.py init_setting.py assets.py; do
+			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py assets.py; do
 				cp "template/$name" "$dir/$name"
 				chmod 755 "$dir/$name"
 			done

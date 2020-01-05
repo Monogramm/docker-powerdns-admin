@@ -51,22 +51,26 @@ fi
 
 log "===> Configuration management"
 
-if [ ! -f config.py ]; then
-  #log "---> Creating default configuration"
-  #cp config_template.py config.py
+if [ ! -f ./powerdnsadmin/docker_config.py ]; then
+  log "---> Creating default configuration"
+  cp ./configs/config_template.py ./powerdnsadmin/docker_config.py
 
   # Generate random secret if default present
-  if grep -q 'We are the world' ./config.py; then
+  if grep -q 'We are the world' ./powerdnsadmin/docker_config.py; then
     log "---> Generating random secret"
     SECRET_KEY=$(openssl rand -hex 64)
-    sed -i "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" ./config.py
+    sed -i \
+      "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" \
+      ./powerdnsadmin/docker_config.py
   fi
 
   # Generate random salt if default present
-  if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./config.py; then
+  if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./powerdnsadmin/docker_config.py; then
     log "---> Generating random salt"
     SALT=$(python3 generate_salt.py)
-    sed -i "s|'SALT', '.*'|'SALT', '${SALT}'|g" ./config.py
+    sed -i \
+      "s|'SALT', '.*'|'SALT', '${SALT}'|g" \
+      ./powerdnsadmin/docker_config.py
   fi
 
 fi

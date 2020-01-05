@@ -3,7 +3,7 @@ FROM ngoduykhanh/powerdns-admin:latest
 ENV BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
 
-COPY docker_config.py generate_salt.py init_admin.py init_setting.py ./
+COPY --chown=pda:pda config_template.py generate_salt.py init_admin.py init_setting.py ./configs/
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
