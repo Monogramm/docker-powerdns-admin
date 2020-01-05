@@ -1,3 +1,4 @@
+# Build image
 FROM alpine:3.10 AS builder
 
 ARG BUILD_DEPENDENCIES="build-base \
@@ -90,10 +91,11 @@ RUN set -ex; \
     apk del ${BUILD_DEPENDENCIES}; \
 	rm -rf /var/cache/apk/*
 
-# Build image
+# Run image
 FROM alpine:3.10
+# FROM ngoduykhanh/powerdns-admin:v0.1
 
-ENV FLASK_APP=/var/www/powerdns-admin/powerdnsadmin/__init__.py \
+ENV FLASK_APP=/app/powerdnsadmin/__init__.py \
 	BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
 
@@ -110,11 +112,11 @@ RUN set -ex; \
 
 COPY --from=builder /usr/bin/flask /usr/bin/
 COPY --from=builder /usr/lib/python3.7/site-packages /usr/lib/python3.7/site-packages/
-COPY --from=builder --chown=pda:pda /app /var/www/powerdns-admin/
+COPY --from=builder --chown=pda:pda /app /app/
 
-WORKDIR /var/www/powerdns-admin
+WORKDIR /app
 
-COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
+COPY docker_config.py generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
@@ -124,7 +126,7 @@ RUN set -ex; \
 		init_admin.py \
 		init_setting.py
 
-VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/migrations", "/var/www/powerdns-admin/db" ]
+VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 # Arguments to label built container
