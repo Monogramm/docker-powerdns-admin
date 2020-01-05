@@ -97,4 +97,4 @@ VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn","app:app"]
+CMD ["gunicorn","powerdnsadmin:create_app()"]
