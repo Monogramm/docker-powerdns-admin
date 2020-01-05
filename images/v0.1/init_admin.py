@@ -2,8 +2,7 @@
 
 import os
 
-from app import db
-from app.models import User
+from powerdnsadmin.models.user import User
 
 
 # Admin user
@@ -18,7 +17,6 @@ admin_user = User(username=ADMIN_USERNAME,
     lastname=ADMIN_LASTNAME,
     email=ADMIN_EMAIL)
 
-# TODO Handle updates?
 result = admin_user.create_local_user()
 if result and result['status']:
     print('Admin user created: ' + ADMIN_USERNAME)

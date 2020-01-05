@@ -2,8 +2,7 @@
 
 import os
 
-from app import db
-from app.models import Setting
+from powerdnsadmin.models.setting import Setting
 
 
 # PDNS Admin settings
@@ -74,8 +73,4 @@ for v in legal_envvars_setting:
     if v in os.environ:
         name = v.lower()
         value = os.environ[v]
-        setting = Setting(name=name, value=value)
-        db.session.add(setting)
-
-
-db.session.commit()
+        Setting().set(name, value)
