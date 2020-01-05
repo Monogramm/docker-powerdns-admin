@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.10 AS builder
 
 ARG BUILD_DEPENDENCIES="build-base \
 	libffi-dev \
@@ -30,14 +30,103 @@ RUN set -ex; \
 		xmlsec \
 	; \
 	apk add --no-cache ${BUILD_DEPENDENCIES}; \
-	ln -s /usr/bin/pip3 /usr/bin/pip; \
-	mkdir -p /usr/src/; \
-	mkdir -p /var/www/powerdns-admin
+	ln -s /usr/bin/pip3 /usr/bin/pip
 
-WORKDIR /var/www/powerdns-admin
-ENV FLASK_APP=app/__init__.py \
+WORKDIR /build
+
+ENV LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    FLASK_APP=/build/powerdnsadmin/__init__.py
+
+ARG VERSION=v0.1
+
+ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${VERSION}.zip /tmp/powerdns-admin.zip
+
+RUN set -ex; \
+	mkdir -p /tmp/powerdns-admin; \
+	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
+	rm /tmp/powerdns-admin.zip; \
+	mkdir -p /usr/src/powerdnsadmin; \
+	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdnsadmin; \
+	rm -rf /tmp/powerdns-admin; \
+	cp -r /usr/src/powerdnsadmin/* .; \
+	rm -rf \
+		./configs/ \
+		./docker/ \
+		./tests/ \
+		./.env \
+		./.travis.yml \
+		./docker-compose*.yml \
+	; \
+	pip install --upgrade pip; \
+	pip install -r ./requirements.txt; \
+	yarn install --pure-lockfile --production; \
+	yarn cache clean; \
+	sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" /build/powerdnsadmin/assets.py; \
+	flask assets build; \
+	mv /build/powerdnsadmin/static /tmp/static; \
+    mkdir /build/powerdnsadmin/static; \
+    cp -r /tmp/static/generated /build/powerdnsadmin/static; \
+    find /tmp/static/node_modules -name 'fonts' -exec cp -r {} /build/powerdnsadmin/static \;; \
+    find /tmp/static/node_modules/icheck/skins/square -name '*.png' -exec cp {} /build/powerdnsadmin/static/generated \;; \
+	{ \
+      echo "from flask_assets import Environment"; \
+      echo "assets = Environment()"; \
+      echo "assets.register('js_login', 'generated/login.js')"; \
+      echo "assets.register('js_validation', 'generated/validation.js')"; \
+      echo "assets.register('css_login', 'generated/login.css')"; \
+      echo "assets.register('js_main', 'generated/main.js')"; \
+      echo "assets.register('css_main', 'generated/main.css')"; \
+    } > /build/powerdnsadmin/assets.py; \
+	mkdir -p /app; \
+    cp -r /build/migrations/ /build/powerdnsadmin/ /build/run.py /app; \
+    mkdir -p /app/configs; \
+    cp -r /build/configs/docker_config.py /app/configs; \
+	pip install pip-autoremove; \
+    pip-autoremove cssmin -y; \
+    pip-autoremove jsmin -y; \
+    pip-autoremove pytest -y; \
+    pip uninstall -y pip-autoremove; \
+    apk del ${BUILD_DEPENDENCIES}; \
+	rm -rf /var/cache/apk/*
+
+# Build image
+FROM alpine:3.10
+
+ENV FLASK_APP=/var/www/powerdns-admin/powerdnsadmin/__init__.py \
 	BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
+
+RUN set -ex; \
+	apk add --no-cache \
+		mariadb-connector-c \
+		postgresql-client \
+		py3-gunicorn \
+		py3-psycopg2 \
+		xmlsec\
+	; \
+    addgroup -S pda; \
+    adduser -S -D -G pda pda
+
+COPY --from=builder /usr/bin/flask /usr/bin/
+COPY --from=builder /usr/lib/python3.7/site-packages /usr/lib/python3.7/site-packages/
+COPY --from=builder --chown=pda:pda /app /var/www/powerdns-admin/
+
+WORKDIR /var/www/powerdns-admin
+
+COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
+COPY entrypoint.sh /entrypoint.sh
+
+RUN set -ex; \
+	chmod 755 \
+		/entrypoint.sh\
+		generate_salt.py \
+		init_admin.py \
+		init_setting.py
+
+VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/migrations", "/var/www/powerdns-admin/db" ]
+HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 # Arguments to label built container
 ARG VCS_REF
@@ -67,52 +156,6 @@ LABEL maintainer="Monogramm maintainers <opensource at monogramm dot io>" \
       org.opencontainers.image.vendor="Khanh Ngo" \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.authors="Monogramm maintainers <opensource at monogramm dot io>"
-
-ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${VERSION}.zip /tmp/powerdns-admin.zip
-
-RUN set -ex; \
-	mkdir -p /tmp/powerdns-admin; \
-	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
-	rm /tmp/powerdns-admin.zip; \
-	mkdir -p /usr/src/powerdns-admin; \
-	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdns-admin; \
-	rm -rf /tmp/powerdns-admin; \
-	cp -r /usr/src/powerdns-admin/* .; \
-	rm -rf \
-		./configs/ \
-		./docker/ \
-		./tests/ \
-		./.env \
-		./.travis.yml \
-		./config_template.py \
-		./docker-compose*.yml \
-		./env-test \
-	; \
-	pip3 install --upgrade pip; \
-	pip3 install -r ./requirements.txt; \
-	pip3 install pip-autoremove; \
-    pip3-autoremove cssmin -y; \
-    pip3-autoremove jsmin -y; \
-    pip3-autoremove pytest -y; \
-    pip3 uninstall -y pip-autoremove; \
-    apk del ${BUILD_DEPENDENCIES}; \
-	rm -rf /var/cache/apk/*; \
-    addgroup -S pda;  \
-    adduser -S -D -G pda pda; \
-	chown -R pda:pda /var/www/powerdns-admin
-
-COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
-COPY entrypoint.sh /entrypoint.sh
-
-RUN set -ex; \
-	chmod 755 \
-		/entrypoint.sh\
-		generate_salt.py \
-		init_admin.py \
-		init_setting.py
-
-VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/migrations", "/var/www/powerdns-admin/db" ]
-HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","powerdnsadmin:create_app()"]
