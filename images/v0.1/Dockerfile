@@ -29,12 +29,9 @@ RUN set -ex; \
 		unzip \
 	; \
 	apk add --no-cache ${BUILD_DEPENDENCIES}; \
+	ln -s /usr/bin/pip3 /usr/bin/pip; \
 	mkdir -p /usr/src/; \
-	mkdir -p /var/www/powerdns-admin; \
-    addgroup -S pda;  \
-    adduser -S -D -G pda pda; \
-	chown -R pda:pda /var/www/powerdns-admin; \
-	rm -rf /var/cache/apk/*
+	mkdir -p /var/www/powerdns-admin
 
 WORKDIR /var/www/powerdns-admin
 ENV FLASK_APP=app/__init__.py \
@@ -97,7 +94,11 @@ RUN set -ex; \
     pip3-autoremove jsmin -y; \
     pip3-autoremove pytest -y; \
     pip3 uninstall -y pip-autoremove; \
-    apk del ${BUILD_DEPENDENCIES}
+    apk del ${BUILD_DEPENDENCIES}; \
+	rm -rf /var/cache/apk/*; \
+    addgroup -S pda;  \
+    adduser -S -D -G pda pda; \
+	chown -R pda:pda /var/www/powerdns-admin
 
 COPY config_template.py generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
