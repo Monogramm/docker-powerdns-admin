@@ -1,18 +1,18 @@
 FROM alpine
 
 ARG BUILD_DEPENDENCIES="build-base \
-    libffi-dev \
-    libxml2-dev \
+	libffi-dev \
+	libxml2-dev \
 	libxslt-dev \
 	mariadb-dev \
-    mariadb-connector-c-dev \
-    openldap-dev \
+	mariadb-connector-c-dev \
+	openldap-dev \
 	openssl-dev \
 	postgresql-dev \
-    py3-pip \
-    python3-dev \
-    xmlsec-dev \
-    yarn"
+	py3-pip \
+	python3-dev \
+	xmlsec-dev \
+	yarn"
 
 RUN set -ex; \
 	apk update; \
@@ -27,6 +27,7 @@ RUN set -ex; \
 		py3-psycopg2 \
 		python3 \
 		unzip \
+		xmlsec \
 	; \
 	apk add --no-cache ${BUILD_DEPENDENCIES}; \
 	ln -s /usr/bin/pip3 /usr/bin/pip; \
