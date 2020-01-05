@@ -2,8 +2,17 @@ version: "2.1"
 
 services:
   powerdns-admin:
-    build: .
+    # For development or CI, tag build from local Dockerfile
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args: 
+        - TAG=${TAG}
+        - VCS_REF=${VCS_REF}
+        - BUILD_DATE=${BUILD_DATE}
     image: powerdns-admin
+    # For production, download prebuilt image
+    #image: monogramm/docker-powerdns-admin:%%VERSION%%
     hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M

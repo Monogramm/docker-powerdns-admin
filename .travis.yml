@@ -14,6 +14,10 @@ before_script:
   - name="powerdns-admin"
   #- image="monogramm/docker-powerdns-admin:travis-${VERSION}${VARIANT:+-$VARIANT}"
   - dir="images/${VERSION}/"
+  - export TAG=travis
+  - export VCS_REF=`git rev-parse --short HEAD`
+  - export BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+  - export IMAGE_NAME=docker-powerdns-admin
 
 script:
   #- travis_retry docker build -t "$image" "$dir"
