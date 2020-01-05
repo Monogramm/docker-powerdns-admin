@@ -1,9 +1,5 @@
 FROM alpine
 
-ARG VERSION=master
-
-LABEL maintainer="Monogramm Maintainers <opensource at monogramm dot io>"
-
 RUN set -ex; \
 	apk update; \
 	apk add --no-cache \
@@ -33,6 +29,35 @@ WORKDIR /var/www/powerdns-admin
 ENV FLASK_APP=app/__init__.py \
 	BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
+
+# Arguments to label built container
+ARG VCS_REF
+ARG BUILD_DATE
+ARG VERSION=master
+
+# Container labels (http://label-schema.org/)
+# Container annotations (https://github.com/opencontainers/image-spec)
+LABEL maintainer="Monogramm maintainers <opensource at monogramm dot io>" \
+      product="PowerDNS-Admin" \
+      version=$VERSION \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/Monogramm/docker-powerdns-admin" \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name="PowerDNS-Admin" \
+      org.label-schema.description="A PowerDNS web interface with advanced features" \
+      org.label-schema.url="https://github.com/ngoduykhanh/PowerDNS-Admin" \
+      org.label-schema.vendor="Khanh Ngo" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.schema-version="1.0" \
+      org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.source="https://github.com/Monogramm/docker-powerdns-admin" \
+      org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.title="PowerDNS-Admin" \
+      org.opencontainers.image.description="A PowerDNS web interface with advanced features" \
+      org.opencontainers.image.url="https://github.com/ngoduykhanh/PowerDNS-Admin" \
+      org.opencontainers.image.vendor="Khanh Ngo" \
+      org.opencontainers.image.version=$VERSION \
+      org.opencontainers.image.authors="Monogramm maintainers <opensource at monogramm dot io>"
 
 ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${VERSION}.zip /tmp/powerdns-admin.zip
 
@@ -69,6 +94,7 @@ RUN set -ex; \
 		init_setting.py
 
 VOLUME [ "/var/www/powerdns-admin/upload", "/var/www/powerdns-admin/logs", "/var/www/powerdns-admin/migrations", "/var/www/powerdns-admin/db" ]
+HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","app:app"]

@@ -18,38 +18,42 @@ before_script:
 script:
   #- travis_retry docker build -t "$image" "$dir"
   - cd "$dir"
-  - mv docker-compose_$COMPOSE.yml docker-compose.yml
-  - rm -f docker-compose_*.yml
-  - travis_retry travis_wait 60 docker-compose build
+  # Test containers build
+  - travis_retry travis_wait 60 docker-compose -f docker-compose.${DATABASE}.test.yml build
   - docker images
-  - travis_retry docker-compose up -d && sleep 60
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
+  # Test containers run
+  - travis_retry docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
-  - docker-compose down
-  - travis_retry docker-compose up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
+  # Test containers can be dropped and restarted
+  - docker-compose -f docker-compose.${DATABASE}.test.yml down
+  - travis_retry docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose ps
-  - docker-compose logs
-  - docker-compose ps "$name" | grep "Up"
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
 
 notifications:
   email: false
 
 matrix:
   allow_failures:
-    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=mysql
-    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=postgres
-    - env: VERSION=v0.1 VARIANT=alpine COMPOSE=sqlite
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=mysql
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=postgres
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=sqlite
 
 env: # Environments
-    - VERSION=master VARIANT=alpine COMPOSE=sqlite
-    - VERSION=master VARIANT=alpine COMPOSE=postgres
-    - VERSION=master VARIANT=alpine COMPOSE=mysql
-    - VERSION=v0.1 VARIANT=alpine COMPOSE=sqlite
-    - VERSION=v0.1 VARIANT=alpine COMPOSE=postgres
-    - VERSION=v0.1 VARIANT=alpine COMPOSE=mysql
+    - VERSION=master VARIANT=alpine DATABASE=sqlite
+    - VERSION=master VARIANT=alpine DATABASE=postgres
+    - VERSION=master VARIANT=alpine DATABASE=mysql
+    - VERSION=v0.1 VARIANT=alpine DATABASE=sqlite
+    - VERSION=v0.1 VARIANT=alpine DATABASE=postgres
+    - VERSION=v0.1 VARIANT=alpine DATABASE=mysql
+    - VERSION=v0.2 VARIANT=alpine DATABASE=sqlite
+    - VERSION=v0.2 VARIANT=alpine DATABASE=postgres
+    - VERSION=v0.2 VARIANT=alpine DATABASE=mysql
