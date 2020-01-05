@@ -46,22 +46,23 @@ for latest in "${latests[@]}"; do
 
 			# Copy the scripts/config files
 			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
-				cp "docker-$name" "$dir/$name"
+				cp "template/$name" "$dir/$name"
 				chmod 755 "$dir/$name"
 			done
 
 			template="Dockerfile-${base[$variant]}.template"
-			cp "$template" "$dir/Dockerfile"
-			cp ".dockerignore" "$dir/.dockerignore"
-			cp "docker-compose_mysql.yml" "$dir/docker-compose_mysql.yml"
-			cp "docker-compose_postgres.yml" "$dir/docker-compose_postgres.yml"
-			cp "docker-compose_sqlite.yml" "$dir/docker-compose_sqlite.yml"
+			cp "template/$template" "$dir/Dockerfile"
+			cp "template/.dockerignore" "$dir/.dockerignore"
+			cp "template/docker-compose_mysql.yml" "$dir/docker-compose_mysql.yml"
+			cp "template/docker-compose_postgres.yml" "$dir/docker-compose_postgres.yml"
+			cp "template/docker-compose_sqlite.yml" "$dir/docker-compose_sqlite.yml"
 
 			# Replace the variables.
 			sed -ri -e '
 				s/%%VERSION%%/'"$latest"'/g;
 			' "$dir/Dockerfile"
 
+			# Add Travis-CI env var
             travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=mysql'"$travisEnv"
             travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=postgres'"$travisEnv"
             travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=sqlite'"$travisEnv"
