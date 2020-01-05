@@ -20,13 +20,12 @@ before_script:
   - export IMAGE_NAME=docker-powerdns-admin
 
 script:
-  #- travis_retry docker build -t "$image" "$dir"
   - cd "$dir"
   # Test containers build
   - docker-compose -f docker-compose.${DATABASE}.test.yml build
   - docker images
   # Test containers run
-  - travis_retry docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps
   - docker-compose -f docker-compose.${DATABASE}.test.yml logs
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
@@ -36,7 +35,7 @@ script:
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
   # Test containers can be dropped and restarted
   - docker-compose -f docker-compose.${DATABASE}.test.yml down
-  - travis_retry docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps
   - docker-compose -f docker-compose.${DATABASE}.test.yml logs
