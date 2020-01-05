@@ -32,6 +32,11 @@ echo "update docker images"
 travisEnv=
 for latest in "${latests[@]}"; do
 	version=$(echo "$latest" | cut -d. -f1-2)
+	if [ "$latest" = 'master' ]; then
+		tag=latest
+	else
+		tag=$(echo "$latest" | cut -dv -f2)
+	fi
 	echo "Checking $latest [$version]..."
 
 	# Only add versions >= "$min_version"
@@ -64,6 +69,7 @@ for latest in "${latests[@]}"; do
 			# Replace the variables.
 			sed -ri -e '
 				s/%%VERSION%%/'"$latest"'/g;
+				s/%%TAG%%/'"$tag"'/g;
 			' "$dir/Dockerfile"
 
 			# Add Travis-CI env var

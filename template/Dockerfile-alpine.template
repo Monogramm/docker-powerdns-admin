@@ -1,120 +1,7 @@
-# Build image
-FROM alpine:3.10 AS builder
+FROM ngoduykhanh/powerdns-admin:%%TAG%%
 
-ARG BUILD_DEPENDENCIES="build-base \
-	libffi-dev \
-	libxml2-dev \
-	libxslt-dev \
-	mariadb-dev \
-	mariadb-connector-c-dev \
-	openldap-dev \
-	openssl-dev \
-	postgresql-dev \
-	py3-pip \
-	python3-dev \
-	xmlsec-dev \
-	yarn"
-
-RUN set -ex; \
-	apk update; \
-	apk add --no-cache \
-		curl \
-		mariadb-connector-c \
-		npm \
-		openssl \
-		postgresql-libs \
-		py3-openssl \
-		py3-gunicorn \
-		py3-psycopg2 \
-		python3 \
-		unzip \
-		xmlsec \
-	; \
-	apk add --no-cache ${BUILD_DEPENDENCIES}; \
-	ln -s /usr/bin/pip3 /usr/bin/pip
-
-ENV LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8 \
-    FLASK_APP=/build/powerdnsadmin/__init__.py
-
-WORKDIR /build
-
-ARG VERSION=%%VERSION%%
-
-ADD https://github.com/ngoduykhanh/PowerDNS-Admin/archive/${VERSION}.zip /tmp/powerdns-admin.zip
-
-RUN set -ex; \
-	mkdir -p /tmp/powerdns-admin; \
-	unzip /tmp/powerdns-admin.zip -d /tmp/powerdns-admin; \
-	rm /tmp/powerdns-admin.zip; \
-	mkdir -p /usr/src/powerdns-admin; \
-	cp -r /tmp/powerdns-admin/PowerDNS-Admin-*/* /usr/src/powerdns-admin; \
-	rm -rf /tmp/powerdns-admin; \
-	cp -r /usr/src/powerdns-admin/* .; \
-	rm -rf \
-		./configs/ \
-		./docker/ \
-		./tests/ \
-		./.env \
-		./.travis.yml \
-		./docker-compose*.yml \
-	;
-
-RUN set -ex; \
-	pip install --upgrade pip; \
-	pip install -r ./requirements.txt; \
-	yarn install --pure-lockfile --production; \
-	yarn cache clean; \
-	sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" ./powerdnsadmin/assets.py; \
-	flask assets build; \
-	mv ./powerdnsadmin/static /tmp/static; \
-    mkdir ./powerdnsadmin/static; \
-    cp -r /tmp/static/generated ./powerdnsadmin/static; \
-    find /tmp/static/node_modules -name 'fonts' -exec cp -r {} ./powerdnsadmin/static \;; \
-    find /tmp/static/node_modules/icheck/skins/square -name '*.png' -exec cp {} ./powerdnsadmin/static/generated \;
-
-COPY assets.py ./powerdnsadmin/assets.py
-
-RUN set -ex; \
-	mkdir -p /app; \
-    cp -r ./migrations/ ./powerdnsadmin/ ./run.py /app; \
-    mkdir -p /app/configs; \
-    cp -r ./configs/docker_config.py /app/configs
-
-RUN set -ex; \
-	pip install pip-autoremove; \
-    pip-autoremove cssmin -y; \
-    pip-autoremove jsmin -y; \
-    pip-autoremove pytest -y; \
-    pip uninstall -y pip-autoremove; \
-    apk del ${BUILD_DEPENDENCIES}; \
-	rm -rf /var/cache/apk/*
-
-# Run image
-FROM alpine:3.10
-# FROM ngoduykhanh/powerdns-admin:%%VERSION%%
-
-ENV FLASK_APP=/app/powerdnsadmin/__init__.py \
-	BIND_ADDRESS=0.0.0.0 \
+ENV BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
-
-RUN set -ex; \
-	apk add --no-cache \
-		mariadb-connector-c \
-		postgresql-client \
-		py3-gunicorn \
-		py3-psycopg2 \
-		xmlsec\
-	; \
-    addgroup -S pda; \
-    adduser -S -D -G pda pda
-
-COPY --from=builder /usr/bin/flask /usr/bin/
-COPY --from=builder /usr/lib/python3.7/site-packages /usr/lib/python3.7/site-packages/
-COPY --from=builder --chown=pda:pda /app /app/
-
-WORKDIR /app
 
 COPY docker_config.py generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
@@ -159,4 +46,4 @@ LABEL maintainer="Monogramm maintainers <opensource at monogramm dot io>" \
       org.opencontainers.image.authors="Monogramm maintainers <opensource at monogramm dot io>"
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn","powerdnsadmin:create_app()"]
+CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]
