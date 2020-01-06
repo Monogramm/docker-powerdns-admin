@@ -79,6 +79,11 @@ fi
 log "===> Database management"
 if [ ! -f "./db/.docker-db-init" ]; then
 
+  if [ "${SQLA_DB_TYPE}" = 'sqlite' ]; then
+    log "---> Init SQLite DB"
+    touch "./db/${PDA_DB_NAME:-pdnsadmin}.sqlite3"
+  fi
+
   log "---> [FIXME] Running DB Migration"
   set +e
   flask db upgrade --help
