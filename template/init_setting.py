@@ -80,3 +80,4 @@ with app.app_context():
             name = v.lower()
             value = os.environ[v]
             Setting().set(name, value)
+            print('Defined Setting: ' + name)
