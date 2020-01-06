@@ -14,10 +14,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    environment:
-      # PowerDNS-Server address
-      - PDNS_HOST=pdns-server
-      - PDNS_PORT=${PDNS_PORT}
 
   powerdns-admin:
     # For development or CI, tag build from local Dockerfile
