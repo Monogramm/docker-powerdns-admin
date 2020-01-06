@@ -84,22 +84,17 @@ if [ ! -f "./db/.docker-db-init" ]; then
     touch "./db/${PDA_DB_NAME:-pdnsadmin}.sqlite3"
   fi
 
-  log "---> [FIXME] Running DB Migration"
+  log "---> Running DB Migration"
   set +e
-  flask db upgrade --help
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
 
-  log "---> [FIXME] Initializing settings"
-  set +e
+  log "---> Initializing settings"
   ./init_setting.py
-  set -e
 
   if [[ -n "${ADMIN_USERNAME}" ]] && [[ -n "${ADMIN_PASSWORD}" ]] && [[ -n "${ADMIN_EMAIL}" ]]; then
-    log "---> [FIXME] Initializing admin user"
-    set +e
+    log "---> Initializing admin user"
     ./init_admin.py
-    set -e
   fi
 
   touch ./db/.docker-db-init
