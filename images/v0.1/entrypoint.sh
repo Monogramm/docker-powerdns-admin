@@ -46,8 +46,6 @@ elif [ ! -f "./db/$PDA_DB_NAME.db" ]; then
   log "===> Initializing SQLite Database"
   mkdir -p ./db
   touch "./db/$PDA_DB_NAME.db"
-  chown -R pda:pda ./db
-  chmod -R 777 ./db
   # FIXME sqlite3.OperationalError: unable to open database file
 fi
 
