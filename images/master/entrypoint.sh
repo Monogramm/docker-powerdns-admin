@@ -45,8 +45,9 @@ if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
 elif [ ! -f "./db/$PDA_DB_NAME.sqlite3" ]; then
   log "===> Initializing SQLite Database"
   mkdir -p ./db
-  #touch "./db/$PDA_DB_NAME.sqlite3"
+  touch "./db/$PDA_DB_NAME.sqlite3"
   chown -R pda:pda ./db
+  # FIXME sqlite3.OperationalError: unable to open database file
 fi
 
 

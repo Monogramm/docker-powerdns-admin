@@ -38,8 +38,6 @@ if SQLA_DB_TYPE == 'sqlite':
 else:
     SQLALCHEMY_DATABASE_URI = SQLA_DB_TYPE+'://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_DB_HOST+':'+str(SQLA_DB_PORT)+'/'+SQLA_DB_NAME
 
-print(SQLALCHEMY_DATABASE_URI)
-
 # SAML Authentication
 SAML_ENABLED = os.getenv('SAML_ENABLED', 'False').lower() == 'true'
 SAML_DEBUG = os.getenv('SAML_DEBUG', 'False').lower() == 'true'
