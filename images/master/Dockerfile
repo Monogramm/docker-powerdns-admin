@@ -13,6 +13,7 @@ RUN set -ex; \
 		openldap-dev \
 		openssl \
 		py3-openssl \
+    sqlite \
 	; \
 	chmod 755 \
 		/entrypoint.sh\
