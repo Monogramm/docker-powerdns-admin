@@ -34,7 +34,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', 'Tr
 
 # DATABASE
 if SQLA_DB_TYPE == 'sqlite':
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(dbdir, SQLA_DB_NAME+'.sqlite3')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(dbdir, SQLA_DB_NAME+'.db')
 else:
     SQLALCHEMY_DATABASE_URI = SQLA_DB_TYPE+'://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_DB_HOST+':'+str(SQLA_DB_PORT)+'/'+SQLA_DB_NAME
 
