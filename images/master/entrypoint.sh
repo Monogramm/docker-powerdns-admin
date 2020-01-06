@@ -79,17 +79,22 @@ fi
 log "===> Database management"
 if [ ! -f "./db/.docker-db-init" ]; then
 
-  log "---> Running DB Migration"
+  log "---> [FIXME] Running DB Migration"
   set +e
+  flask db upgrade --help
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
 
-  log "---> [TODO] Initializing settings"
+  log "---> [FIXME] Initializing settings"
+  set +e
   ./init_setting.py
+  set -e
 
   if [[ -n "${ADMIN_USERNAME}" ]] && [[ -n "${ADMIN_PASSWORD}" ]] && [[ -n "${ADMIN_EMAIL}" ]]; then
-    log "---> [TODO] Initializing admin user"
+    log "---> [FIXME] Initializing admin user"
+    set +e
     ./init_admin.py
+    set -e
   fi
 
   touch ./db/.docker-db-init
