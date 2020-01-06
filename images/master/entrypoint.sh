@@ -82,7 +82,6 @@ if [ ! -f "./db/.docker-db-init" ]; then
 
   log "---> Running DB Migration"
   set +e
-  flask db upgrade --help
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
 
@@ -100,7 +99,6 @@ else
 
   log "---> Running DB Upgrade"
   set +e
-  flask db upgrade --help
   flask db upgrade --directory ${DB_MIGRATION_DIR}
   set -e
 
