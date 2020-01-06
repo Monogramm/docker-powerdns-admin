@@ -22,24 +22,24 @@ before_script:
 script:
   - cd "$dir"
   # Test containers build
-  - docker-compose -f docker-compose.${DATABASE}.test.yml build
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml build
   - docker images
   # Test containers run
-  - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml logs "$name"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps "$name" | grep "Up"
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml logs "$name"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps "$name" | grep "Up"
   # Test containers can be dropped and restarted
-  - docker-compose -f docker-compose.${DATABASE}.test.yml down
-  - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml down
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml up -d && sleep 60
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
-  - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml logs "$name"
+  - docker-compose -f docker-compose.${DATABASE}${DC_SUFFIX}.yml ps "$name" | grep "Up"
 
 notifications:
   email: false
@@ -53,12 +53,12 @@ matrix:
     - env: VERSION=master VARIANT=alpine DATABASE=sqlite
 
 env: # Environments
-    - VERSION=master VARIANT=alpine DATABASE=sqlite
-    - VERSION=master VARIANT=alpine DATABASE=postgres
-    - VERSION=master VARIANT=alpine DATABASE=mysql
-    - VERSION=v0.1 VARIANT=alpine DATABASE=sqlite
-    - VERSION=v0.1 VARIANT=alpine DATABASE=postgres
-    - VERSION=v0.1 VARIANT=alpine DATABASE=mysql
-    - VERSION=v0.2 VARIANT=alpine DATABASE=sqlite
-    - VERSION=v0.2 VARIANT=alpine DATABASE=postgres
-    - VERSION=v0.2 VARIANT=alpine DATABASE=mysql
+    - VERSION=master VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
+    - VERSION=master VARIANT=alpine DATABASE=postgres DC_SUFFIX=.test
+    - VERSION=master VARIANT=alpine DATABASE=mysql DC_SUFFIX=.test
+    - VERSION=v0.1 VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
+    - VERSION=v0.1 VARIANT=alpine DATABASE=postgres DC_SUFFIX=.test
+    - VERSION=v0.1 VARIANT=alpine DATABASE=mysql DC_SUFFIX=.test
+    - VERSION=v0.2 VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
+    - VERSION=v0.2 VARIANT=alpine DATABASE=postgres DC_SUFFIX=.test
+    - VERSION=v0.2 VARIANT=alpine DATABASE=mysql DC_SUFFIX=.test

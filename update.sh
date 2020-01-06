@@ -64,7 +64,7 @@ for latest in "${latests[@]}"; do
 			cp -r "template/test" "$dir/"
 			cp "template/docker-compose.mysql.test.yml" "$dir/docker-compose.mysql.test.yml"
 			cp "template/docker-compose.postgres.test.yml" "$dir/docker-compose.postgres.test.yml"
-			cp "template/docker-compose.sqlite.test.yml" "$dir/docker-compose.sqlite.test.yml"
+			cp "template/docker-compose.sqlite.yml" "$dir/docker-compose.sqlite.yml"
 
 			# Replace the variables.
 			sed -ri -e '
@@ -73,9 +73,9 @@ for latest in "${latests[@]}"; do
 			' "$dir/Dockerfile"
 
 			# Add Travis-CI env var
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=mysql'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=postgres'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=sqlite'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=mysql DC_SUFFIX=.test'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=postgres DC_SUFFIX=.test'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=sqlite DC_SUFFIX='"$travisEnv"
 
 			if [[ $1 == 'build' ]]; then
 				tag="$version"
