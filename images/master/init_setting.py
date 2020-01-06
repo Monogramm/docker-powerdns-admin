@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import logging
 
 from powerdnsadmin import create_app
 from powerdnsadmin.models.setting import Setting
