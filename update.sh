@@ -19,8 +19,10 @@ function version_greater_or_equal() {
 
 dockerRepo="monogramm/docker-powerdns-admin"
 latests=( $( curl -fsSL 'https://api.github.com/repos/ngoduykhanh/powerdns-admin/tags' |tac|tac| \
-	grep -oE 'v[[:digit:]]+\.[[:digit:]]+' | \
-	sort -urV ) master )
+	grep -oE 'v[[:digit:]]+(\.[[:digit:]]+)+' | \
+	sort -urV )
+	master
+)
 
 # Remove existing images
 echo "reset docker images"
@@ -30,6 +32,11 @@ echo "update docker images"
 travisEnv=
 for latest in "${latests[@]}"; do
 	version=$(echo "$latest" | cut -d. -f1-2)
+	if [ "$latest" = 'master' ]; then
+		tag=latest
+	else
+		tag=$(echo "$latest" | cut -dv -f2)
+	fi
 	echo "Checking $latest [$version]..."
 
 	# Only add versions >= "$min_version"
@@ -45,26 +52,30 @@ for latest in "${latests[@]}"; do
 			mkdir -p "$dir"
 
 			# Copy the scripts/config files
-			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py; do
-				cp "docker-$name" "$dir/$name"
+			for name in .env entrypoint.sh config_template.py generate_salt.py init_admin.py init_setting.py assets.py; do
+				cp "template/$name" "$dir/$name"
 				chmod 755 "$dir/$name"
 			done
 
 			template="Dockerfile-${base[$variant]}.template"
-			cp "$template" "$dir/Dockerfile"
-			cp ".dockerignore" "$dir/.dockerignore"
-			cp "docker-compose_mysql.yml" "$dir/docker-compose_mysql.yml"
-			cp "docker-compose_postgres.yml" "$dir/docker-compose_postgres.yml"
-			cp "docker-compose_sqlite.yml" "$dir/docker-compose_sqlite.yml"
+			cp "template/$template" "$dir/Dockerfile"
+			cp "template/.dockerignore" "$dir/.dockerignore"
+			cp -r "template/hooks" "$dir/"
+			cp -r "template/test" "$dir/"
+			cp "template/docker-compose.mysql.test.yml" "$dir/docker-compose.mysql.test.yml"
+			cp "template/docker-compose.postgres.test.yml" "$dir/docker-compose.postgres.test.yml"
+			cp "template/docker-compose.sqlite.yml" "$dir/docker-compose.sqlite.yml"
 
 			# Replace the variables.
 			sed -ri -e '
 				s/%%VERSION%%/'"$latest"'/g;
+				s/%%TAG%%/'"$tag"'/g;
 			' "$dir/Dockerfile"
 
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=mysql'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=postgres'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' COMPOSE=sqlite'"$travisEnv"
+			# Add Travis-CI env var
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=mysql DC_SUFFIX=.test'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=postgres DC_SUFFIX=.test'"$travisEnv"
+            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=sqlite DC_SUFFIX='"$travisEnv"
 
 			if [[ $1 == 'build' ]]; then
 				tag="$version"

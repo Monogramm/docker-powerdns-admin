@@ -1,4 +1,4 @@
-FROM ngoduykhanh/powerdns-admin:latest
+FROM ngoduykhanh/powerdns-admin:0.2.1
 
 ENV BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
@@ -28,7 +28,7 @@ HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.
 # Arguments to label built container
 ARG VCS_REF
 ARG BUILD_DATE
-ARG VERSION=master
+ARG VERSION=v0.2.1
 
 # Container labels (http://label-schema.org/)
 # Container annotations (https://github.com/opencontainers/image-spec)

@@ -42,31 +42,34 @@ if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
     log "Database ($PDA_DB_HOST) is unavailable - sleeping"
     sleep 1
   done
-elif [ ! -f "./db/$PDA_DB_NAME.sqlite3" ]; then
+elif [ ! -f "./db/$PDA_DB_NAME.db" ]; then
   log "===> Initializing SQLite Database"
   mkdir -p ./db
-  touch "./db/$PDA_DB_NAME.sqlite3"
 fi
 
 
 log "===> Configuration management"
 
-if [ ! -f config.py ]; then
+if [ ! -f ./powerdnsadmin/docker_config.py ]; then
   log "---> Creating default configuration"
-  cp config_template.py config.py
+  cp ./configs/config_template.py ./powerdnsadmin/docker_config.py
 
   # Generate random secret if default present
-  if grep -q 'We are the world' ./config.py; then
+  if grep -q 'We are the world' ./powerdnsadmin/docker_config.py; then
     log "---> Generating random secret"
     SECRET_KEY=$(openssl rand -hex 64)
-    sed -i "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" ./config.py
+    sed -i \
+      "s|'SECRET_KEY', 'We are the world'|'SECRET_KEY', '${SECRET_KEY}'|g" \
+      ./powerdnsadmin/docker_config.py
   fi
 
   # Generate random salt if default present
-  if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./config.py; then
+  if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./powerdnsadmin/docker_config.py; then
     log "---> Generating random salt"
-    SALT=$(python3 generate_salt.py)
-    sed -i "s|'SALT', '.*'|'SALT', '${SALT}'|g" ./config.py
+    SALT=$(python3 ./generate_salt.py)
+    sed -i \
+      "s|'SALT', '.*'|'SALT', '${SALT}'|g" \
+      ./powerdnsadmin/docker_config.py
   fi
 
 fi
@@ -100,20 +103,12 @@ else
 fi
 
 
-log "===> Assets management"
-log "---> Running Yarn"
-yarn install --pure-lockfile
-# Fix for https://github.com/ngoduykhanh/PowerDNS-Admin/issues/310
-ln -sf "$(pwd)/node_modules" ./app/static/node_modules
-
-log "---> Running Flask assets"
-flask assets build
-
-
 log "===> Start gunicorn server"
 GUNICORN_TIMEOUT="${GUINCORN_TIMEOUT:-120}"
 GUNICORN_WORKERS="${GUNICORN_WORKERS:-4}"
 GUNICORN_LOGLEVEL="${GUNICORN_LOGLEVEL:-info}"
+BIND_ADDRESS="${BIND_ADDRESS:-0.0.0.0}"
+PORT="${PORT:-9191}"
 
 GUNICORN_ARGS="-t ${GUNICORN_TIMEOUT} --workers ${GUNICORN_WORKERS} --bind ${BIND_ADDRESS}:${PORT} --log-level ${GUNICORN_LOGLEVEL}"
 

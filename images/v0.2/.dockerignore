@@ -1,0 +1,3 @@
+# Ignore files during docker build
+docker-compose.yml
+.env

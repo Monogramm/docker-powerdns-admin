@@ -1,9 +1,32 @@
 version: "2.1"
 
 services:
+  # https://docs.docker.com/docker-hub/builds/automated-testing/
+  sut:
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    depends_on:
+      - powerdns-admin
+      - powerdns-admin-postgresql
+      - pdns-server
+      - pdns-postgresql
+    volumes_from:
+      - powerdns-admin
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
   powerdns-admin:
-    build: .
+    # For development or CI, tag build from local Dockerfile
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - VCS_REF=${VCS_REF}
+        - BUILD_DATE=${BUILD_DATE}
     image: powerdns-admin
+    # For production, download prebuilt image
     #image: monogramm/docker-powerdns-admin:%%VERSION%%
     hostname: powerdns-admin
     container_name: powerdns-admin
@@ -30,7 +53,7 @@ services:
       - PDA_DB_PASSWORD=${PDA_DB_PASSWORD}
       # PostgreSQL
       - PDA_DB_TYPE=postgresql
-      - PDA_DB_HOST=${PDA_DB_HOST}
+      - PDA_DB_HOST=powerdns-admin-postgresql
       - PDA_DB_PORT=5432
       # Gunicorn configuration
       - BIND_ADDRESS=0.0.0.0
@@ -43,9 +66,9 @@ services:
       - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
       - PDNS_PROTO=${PDNS_PROTO}
-      - PDNS_HOST=${PDNS_HOST}
+      - PDNS_HOST=pdns-server
       - PDNS_PORT=${PDNS_PORT}
-      - PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
+      - PDNS_API_URL=${PDNS_PROTO}://pdns-server:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
       - SIGNUP_ENABLED=False
     # PostgreSQL
@@ -55,8 +78,8 @@ services:
   # PostgreSQL
   powerdns-admin-postgresql:
     image: postgres:10-alpine
-    hostname: ${PDA_DB_HOST}
-    container_name: ${PDA_DB_HOST}
+    hostname: powerdns-admin-postgresql
+    container_name: powerdns-admin-postgresql
     restart: always
     volumes:
       - powerdns-admin-postgresql-data:/var/lib/postgresql/data
@@ -69,8 +92,9 @@ services:
 
   pdns-server:
     image: monogramm/docker-powerdns:develop
-    hostname: ${PDNS_HOST}
-    container_name: ${PDNS_HOST}
+    hostname: pdns-server
+    container_name: pdns-server
+    restart: always
     ports:
       - "5053:53"
       - "5053:53/udp"
@@ -82,7 +106,7 @@ services:
     environment:
       - AUTOCONF=postgres
       # PostgreSQL
-      - PGSQL_HOST=${PDNS_DB_HOST}
+      - PGSQL_HOST=pdns-postgresql
       - PGSQL_PORT=5432
       - PGSQL_DB=${PDNS_DB_NAME}
       - PGSQL_USER=${PDNS_DB_USER}
@@ -94,13 +118,14 @@ services:
       - PDNS_WEBSERVER_PORT=${PDNS_PORT}
       - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
       - PDNS_SOA_REFRESH_DEFAULT=14400
+    # PostgreSQL
     depends_on:
       - pdns-postgresql
 
   pdns-postgresql:
     image: postgres:10-alpine
-    hostname: ${PDNS_DB_HOST}
-    container_name: ${PDNS_DB_HOST}
+    hostname: pdns-postgresql
+    container_name: pdns-postgresql
     restart: always
     environment:
       - POSTGRES_DB=${PDNS_DB_NAME}

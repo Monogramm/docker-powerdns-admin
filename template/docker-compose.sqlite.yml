@@ -1,14 +1,37 @@
 version: "2.1"
 
 services:
+  # https://docs.docker.com/docker-hub/builds/automated-testing/
+  sut:
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    depends_on:
+      - powerdns-admin
+      - pdns-server
+    volumes_from:
+      - powerdns-admin
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
   powerdns-admin:
-    build: .
+    # For development or CI, tag build from local Dockerfile
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - VCS_REF=${VCS_REF}
+        - BUILD_DATE=${BUILD_DATE}
     image: powerdns-admin
+    # For production, download prebuilt image
     #image: monogramm/docker-powerdns-admin:%%VERSION%%
     hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M
     memswap_limit: 256M
+    depends_on:
+      - pdns-server
     ports:
       - "9191:${PDA_PORT}"
     volumes:
@@ -41,16 +64,17 @@ services:
       - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
       - PDNS_PROTO=${PDNS_PROTO}
-      - PDNS_HOST=${PDNS_HOST}
+      - PDNS_HOST=pdns-server
       - PDNS_PORT=${PDNS_PORT}
-      - PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
+      - PDNS_API_URL=${PDNS_PROTO}://pdns-server:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
       - SIGNUP_ENABLED=False
 
   pdns-server:
     image: monogramm/docker-powerdns:develop
-    hostname: ${PDNS_HOST}
-    container_name: ${PDNS_HOST}
+    hostname: pdns-server
+    container_name: pdns-server
+    restart: always
     ports:
       - "5053:53"
       - "5053:53/udp"

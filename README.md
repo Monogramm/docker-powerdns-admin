@@ -25,10 +25,11 @@ PowerDNS Admin is a PowerDNS web interface with monitoring and administration fe
 https://hub.docker.com/r/monogramm/docker-powerdns-admin/
 
 * `master` `latest`
+* `0.2`
 
 ## How to run this image ?
 
-This image is based on the [official alpine repository](https://registry.hub.docker.com/_/alpine/).
+This image is based on the [official ngoduykhanh/PowerDNS-Admin repository](https://hub.docker.com/r/ngoduykhanh/powerdns-admin).
 It is inspired from [PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) and [ixpict/powerdns-admin-pgsql](https://github.com/ixpict/powerdns-admin-pgsql).
 
 This image does not contain the database for PowerDNS Admin. You need to use either an existing database or a database container.
