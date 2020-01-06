@@ -49,6 +49,8 @@ matrix:
     - env: VERSION=v0.1 VARIANT=alpine DATABASE=mysql
     - env: VERSION=v0.1 VARIANT=alpine DATABASE=postgres
     - env: VERSION=v0.1 VARIANT=alpine DATABASE=sqlite
+    - env: VERSION=v0.2 VARIANT=alpine DATABASE=sqlite
+    - env: VERSION=master VARIANT=alpine DATABASE=sqlite
 
 env: # Environments
     - VERSION=master VARIANT=alpine DATABASE=sqlite
