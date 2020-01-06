@@ -67,7 +67,7 @@ if [ ! -f ./powerdnsadmin/docker_config.py ]; then
   # Generate random salt if default present
   if grep -q '$2b$12$yLUMTIfl21FKJQpTkRQXCu' ./powerdnsadmin/docker_config.py; then
     log "---> Generating random salt"
-    SALT=$(python3 ./configs/generate_salt.py)
+    SALT=$(python3 ./generate_salt.py)
     sed -i \
       "s|'SALT', '.*'|'SALT', '${SALT}'|g" \
       ./powerdnsadmin/docker_config.py
@@ -85,11 +85,11 @@ if [ ! -f "./db/.docker-db-init" ]; then
   set -e
 
   log "---> [TODO] Initializing settings"
-  ./configs/init_setting.py
+  ./init_setting.py
 
   if [[ -n "${ADMIN_USERNAME}" ]] && [[ -n "${ADMIN_PASSWORD}" ]] && [[ -n "${ADMIN_EMAIL}" ]]; then
     log "---> [TODO] Initializing admin user"
-    ./configs/init_admin.py
+    ./init_admin.py
   fi
 
   touch ./db/.docker-db-init

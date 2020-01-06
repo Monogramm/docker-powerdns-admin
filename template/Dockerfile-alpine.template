@@ -3,7 +3,8 @@ FROM ngoduykhanh/powerdns-admin:%%TAG%%
 ENV BIND_ADDRESS=0.0.0.0 \
 	PORT=9191
 
-COPY --chown=pda:pda config_template.py generate_salt.py init_admin.py init_setting.py ./configs/
+COPY --chown=pda:pda config_template.py ./configs/
+COPY --chown=pda:pda generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
@@ -15,9 +16,9 @@ RUN set -ex; \
 	; \
 	chmod 755 \
 		/entrypoint.sh\
-		./configs/generate_salt.py \
-		./configs/init_admin.py \
-		./configs/init_setting.py \
+		./generate_salt.py \
+		./init_admin.py \
+		./init_setting.py \
     ;
 
 VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]

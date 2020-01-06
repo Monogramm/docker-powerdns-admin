@@ -27,18 +27,18 @@ script:
   # Test containers run
   - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
   # Test containers can be dropped and restarted
   - docker-compose -f docker-compose.${DATABASE}.test.yml down
   - docker-compose -f docker-compose.${DATABASE}.test.yml up -d && sleep 60
   - echo 'Wait until everything ready (2-3 minutes)' && sleep 180
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps
-  - docker-compose -f docker-compose.${DATABASE}.test.yml logs
+  - docker-compose -f docker-compose.${DATABASE}.test.yml logs "$name"
   - docker-compose -f docker-compose.${DATABASE}.test.yml ps "$name" | grep "Up"
 
 notifications:
