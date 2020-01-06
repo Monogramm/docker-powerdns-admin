@@ -45,8 +45,6 @@ if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
 elif [ ! -f "./db/$PDA_DB_NAME.db" ]; then
   log "===> Initializing SQLite Database"
   mkdir -p ./db
-  # FIXME sqlite3.OperationalError: unable to open database file
-  cat ./docker-test/pdns.sql | sqlite3 "./db/$PDA_DB_NAME.db"
 fi
 
 
