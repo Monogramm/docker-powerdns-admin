@@ -45,7 +45,8 @@ if [ "${PDA_DB_TYPE}" != "sqlite" ]; then
 elif [ ! -f "./db/$PDA_DB_NAME.sqlite3" ]; then
   log "===> Initializing SQLite Database"
   mkdir -p ./db
-  touch "./db/$PDA_DB_NAME.sqlite3"
+  #touch "./db/$PDA_DB_NAME.sqlite3"
+  chown -R pda:pda ./db
 fi
 
 
@@ -78,11 +79,6 @@ fi
 
 log "===> Database management"
 if [ ! -f "./db/.docker-db-init" ]; then
-
-  if [ "${SQLA_DB_TYPE}" = 'sqlite' ]; then
-    log "---> Init SQLite DB"
-    touch "./db/${PDA_DB_NAME:-pdnsadmin}.sqlite3"
-  fi
 
   log "---> Running DB Migration"
   set +e
