@@ -78,6 +78,7 @@ services:
     image: monogramm/docker-powerdns:develop
     hostname: ${PDNS_HOST}
     container_name: ${PDNS_HOST}
+    restart: always
     ports:
       - "5053:53"
       - "5053:53/udp"
