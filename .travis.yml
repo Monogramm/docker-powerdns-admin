@@ -46,11 +46,11 @@ notifications:
 
 matrix:
   allow_failures:
-    - env: VERSION=v0.1 VARIANT=alpine DATABASE=mysql
-    - env: VERSION=v0.1 VARIANT=alpine DATABASE=postgres
-    - env: VERSION=v0.1 VARIANT=alpine DATABASE=sqlite
-    - env: VERSION=v0.2 VARIANT=alpine DATABASE=sqlite
-    - env: VERSION=master VARIANT=alpine DATABASE=sqlite
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=mysql DC_SUFFIX=.test
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=postgres DC_SUFFIX=.test
+    - env: VERSION=v0.1 VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
+    - env: VERSION=v0.2 VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
+    - env: VERSION=master VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
 
 env: # Environments
     - VERSION=master VARIANT=alpine DATABASE=sqlite DC_SUFFIX=
