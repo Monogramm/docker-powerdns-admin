@@ -16,7 +16,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     environment:
       # PowerDNS-Server address
-      - PDNS_HOST=${PDNS_HOST}
+      - PDNS_HOST=pdns-server
       - PDNS_PORT=${PDNS_PORT}
 
   powerdns-admin:
@@ -68,16 +68,16 @@ services:
       - ADMIN_EMAIL=${PDA_ADMIN_EMAIL}
       # PowerDNS-Admin configuration
       - PDNS_PROTO=${PDNS_PROTO}
-      - PDNS_HOST=${PDNS_HOST}
+      - PDNS_HOST=pdns-server
       - PDNS_PORT=${PDNS_PORT}
-      - PDNS_API_URL=${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}/api/v1
+      - PDNS_API_URL=${PDNS_PROTO}://pdns-server:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
       - SIGNUP_ENABLED=False
 
   pdns-server:
     image: monogramm/docker-powerdns:develop
-    hostname: ${PDNS_HOST}
-    container_name: ${PDNS_HOST}
+    hostname: pdns-server
+    container_name: pdns-server
     restart: always
     ports:
       - "5053:53"
