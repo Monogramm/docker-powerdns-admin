@@ -81,6 +81,8 @@ services:
     hostname: powerdns-admin-postgresql
     container_name: powerdns-admin-postgresql
     restart: always
+    networks:
+      - default
     volumes:
       - powerdns-admin-postgresql-data:/var/lib/postgresql/data
       - /etc/localtime:/etc/localtime:ro
