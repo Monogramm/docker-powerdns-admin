@@ -1,29 +1,32 @@
 FROM ngoduykhanh/powerdns-admin:latest
 
 ENV BIND_ADDRESS=0.0.0.0 \
-	PORT=9191
+  PORT=9191
 
 COPY --chown=pda:pda config_template.py ./configs/
 COPY --chown=pda:pda generate_salt.py init_admin.py init_setting.py ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN set -ex; \
-	apk update; \
-	apk add --no-cache \
-		openldap-dev \
-		openssl \
-		py3-openssl \
+  apk update; \
+  apk add --no-cache \
+    openldap-dev \
+    openssl \
+    py3-openssl \
     sqlite \
-	; \
-	chmod 755 \
-		/entrypoint.sh\
-		./generate_salt.py \
-		./init_admin.py \
-		./init_setting.py \
-    ;
+  ; \
+  chmod 755 \
+    /entrypoint.sh\
+    ./generate_salt.py \
+    ./init_admin.py \
+    ./init_setting.py \
+  ;
 
 VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
 HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]
 
 # Arguments to label built container
 ARG VCS_REF
@@ -53,6 +56,3 @@ LABEL maintainer="Monogramm maintainers <opensource at monogramm dot io>" \
       org.opencontainers.image.vendor="Khanh Ngo" \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.authors="Monogramm maintainers <opensource at monogramm dot io>"
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]

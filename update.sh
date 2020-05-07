@@ -57,7 +57,7 @@ for latest in "${latests[@]}"; do
 				chmod 755 "$dir/$name"
 			done
 
-			template="Dockerfile-${base[$variant]}.template"
+			template="Dockerfile.${base[$variant]}.template"
 			cp "template/$template" "$dir/Dockerfile"
 			cp "template/.dockerignore" "$dir/.dockerignore"
 			cp -r "template/hooks" "$dir/"
