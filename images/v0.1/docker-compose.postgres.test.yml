@@ -1,4 +1,4 @@
-version: "2.1"
+version: "2.3"
 
 services:
   # https://docs.docker.com/docker-hub/builds/automated-testing/
@@ -32,6 +32,8 @@ services:
     container_name: powerdns-admin
     mem_limit: 256M
     memswap_limit: 256M
+    healthcheck:
+      test: ["CMD", "wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:9191/"]
     ports:
       - "9191:${PDA_PORT}"
     volumes:

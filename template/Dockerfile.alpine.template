@@ -23,7 +23,6 @@ RUN set -ex; \
   ;
 
 VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
-HEALTHCHECK CMD ["wget","--output-document=-","--quiet","--tries=1","http://127.0.0.1:${PORT}/"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]
