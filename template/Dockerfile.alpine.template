@@ -3,9 +3,7 @@ FROM ngoduykhanh/powerdns-admin:%%TAG%%
 ENV BIND_ADDRESS=0.0.0.0 \
   PORT=9191
 
-COPY --chown=pda:pda config_template.py ./configs/
-COPY --chown=pda:pda generate_salt.py init_admin.py init_setting.py ./
-COPY entrypoint.sh /entrypoint.sh
+USER root
 
 RUN set -ex; \
   apk update; \
@@ -15,17 +13,19 @@ RUN set -ex; \
     py3-openssl \
     sqlite \
   ; \
-  chmod 755 \
-    /entrypoint.sh\
-    ./generate_salt.py \
-    ./init_admin.py \
-    ./init_setting.py \
-  ;
+  mkdir -p ./db ./upload ./logs; \
+  chown pda:pda ./db ./upload ./logs
 
-VOLUME [ "/app/upload", "/app/logs", "/app/migrations", "/app/db" ]
+COPY --chown=pda:pda config_template.py ./configs/
+COPY --chown=pda:pda generate_salt.py init_admin.py init_setting.py ./
+COPY entrypoint.sh /entrypoint.sh
+
+VOLUME [ "/app/db", "/app/upload", "/app/logs", "/app/migrations" ]
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]
+
+USER pda
 
 # Arguments to label built container
 ARG VCS_REF

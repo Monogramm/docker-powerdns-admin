@@ -9,7 +9,8 @@ variants=(
 	alpine
 )
 
-min_version=''
+min_version='0.2'
+dockerLatest='master'
 
 
 # version_greater_or_equal A B returns whether A >= B
@@ -26,7 +27,7 @@ latests=( $( curl -fsSL 'https://api.github.com/repos/ngoduykhanh/powerdns-admin
 
 # Remove existing images
 echo "reset docker images"
-find ./images -maxdepth 1 -type d -regextype sed -regex '\./images/.*' -exec rm -r '{}' \;
+rm -rf ./images/*
 
 echo "update docker images"
 travisEnv=
@@ -42,7 +43,7 @@ for latest in "${latests[@]}"; do
 	# Only add versions >= "$min_version"
 	if version_greater_or_equal "$version" "$min_version"; then
 
-        for variant in "${variants[@]}"; do
+		for variant in "${variants[@]}"; do
 			# Create the version directory with a Dockerfile.
 			dir="images/$version"
 			if [ -d "$dir" ]; then
@@ -64,7 +65,7 @@ for latest in "${latests[@]}"; do
 			cp -r "template/test" "$dir/"
 			cp "template/docker-compose.mysql.test.yml" "$dir/docker-compose.mysql.test.yml"
 			cp "template/docker-compose.postgres.test.yml" "$dir/docker-compose.postgres.test.yml"
-			cp "template/docker-compose.sqlite.yml" "$dir/docker-compose.sqlite.yml"
+			cp "template/docker-compose.sqlite.test.yml" "$dir/docker-compose.sqlite.test.yml"
 
 			# Replace the variables.
 			sed -ri -e '
@@ -72,17 +73,37 @@ for latest in "${latests[@]}"; do
 				s/%%TAG%%/'"$tag"'/g;
 			' "$dir/Dockerfile"
 
+			sed -ri -e '
+				s|DOCKER_TAG=.*|DOCKER_TAG='"$version"'|g;
+				s|DOCKER_REPO=.*|DOCKER_REPO='"$dockerRepo"'|g;
+			' "$dir/hooks/run"
+
+			# Create a list of "alias" tags for DockerHub post_push
+			if [ "$latest" = "$dockerLatest" ]; then
+				if [ "$variant" = 'alpine' ]; then
+					echo "$latest-$variant $version-$variant $variant $latest $version latest " > "$dir/.dockertags"
+				else
+					echo "$latest-$variant $version-$variant $variant " > "$dir/.dockertags"
+				fi
+			else
+				if [ "$variant" = 'alpine' ]; then
+					echo "$latest-$variant $version-$variant $latest $version " > "$dir/.dockertags"
+				else
+					echo "$latest-$variant $version-$variant " > "$dir/.dockertags"
+				fi
+			fi
+
 			# Add Travis-CI env var
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=mysql DC_SUFFIX=.test'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=postgres DC_SUFFIX=.test'"$travisEnv"
-            travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=sqlite DC_SUFFIX='"$travisEnv"
+			travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=mysql DC_SUFFIX=.test'"$travisEnv"
+			travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=postgres DC_SUFFIX=.test'"$travisEnv"
+			travisEnv='\n    - VERSION='"$version"' VARIANT='"$variant"' DATABASE=sqlite DC_SUFFIX='"$travisEnv"
 
 			if [[ $1 == 'build' ]]; then
 				tag="$version"
 				echo "Build Dockerfile for ${tag}"
-				docker build -t ${dockerRepo}:${tag} $dir
+				docker build -t "${dockerRepo}:${tag}" "$dir"
 			fi
-        done
+		done
 
 	fi
 

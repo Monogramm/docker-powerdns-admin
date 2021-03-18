@@ -1,5 +1,16 @@
 version: "2.3"
 
+networks:
+  default:
+
+volumes:
+  powerdns-admin-upload:
+  powerdns-admin-logs:
+  powerdns-admin-db:
+  # MySQL / MariaDB
+  powerdns-admin-mysql-data:
+  powerdns-mysql-data:
+
 services:
   # https://docs.docker.com/docker-hub/builds/automated-testing/
   sut:
@@ -13,6 +24,10 @@ services:
       - pdns-mysql
     volumes_from:
       - powerdns-admin
+    environment:
+      - DOCKER_TEST_CONTAINER=powerdns-admin
+      - DOCKER_WEB_CONTAINER=powerdns-admin
+      - DOCKER_WEB_PORT=${PDA_PORT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -23,11 +38,10 @@ services:
       context: ./
       dockerfile: Dockerfile
       args:
+        - TAG=${DOCKER_TAG}
         - VCS_REF=${VCS_REF}
         - BUILD_DATE=${BUILD_DATE}
-    image: powerdns-admin
-    # For production, download prebuilt image
-    #image: monogramm/docker-powerdns-admin:%%VERSION%%
+    image: ${IMAGE_NAME}
     hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M
@@ -46,6 +60,10 @@ services:
       driver: json-file
       options:
         max-size: 50m
+    # MySQL / MariaDB
+    depends_on:
+      powerdns-admin-mysql:
+        condition: service_healthy
     networks:
       - default
     environment:
@@ -73,16 +91,17 @@ services:
       - PDNS_API_URL=${PDNS_PROTO}://pdns-server:${PDNS_PORT}/api/v1
       - PDNS_API_KEY=${PDNS_API_KEY}
       - SIGNUP_ENABLED=False
-    # MySQL / MariaDB
-    depends_on:
-      powerdns-admin-mysql:
-        condition: service_healthy
 
   # MySQL / MariaDB
   powerdns-admin-mysql:
     image: mariadb:10.3
     hostname: powerdns-admin-mysql
     container_name: powerdns-admin-mysql
+    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 30s
+      retries: 5
     mem_limit: 256M
     memswap_limit: 256M
     expose:
@@ -93,16 +112,11 @@ services:
       - /etc/timezone:/etc/timezone:ro
     networks:
       - default
-    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
     environment:
       - MYSQL_DATABASE=${PDA_DB_NAME}
       - MYSQL_USER=${PDA_DB_USER}
       - MYSQL_PASSWORD=${PDA_DB_PASSWORD}
       - MYSQL_RANDOM_ROOT_PASSWORD=1
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 30s
-      retries: 5
 
   pdns-server:
     image: monogramm/docker-powerdns:develop
@@ -112,6 +126,10 @@ services:
     ports:
       - "5053:53"
       - "5053:53/udp"
+    # MySQL / MariaDB
+    depends_on:
+      pdns-mysql:
+        condition: service_healthy
     networks:
       - default
     volumes:
@@ -132,15 +150,16 @@ services:
       - PDNS_WEBSERVER_PORT=${PDNS_PORT}
       - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
       - PDNS_SOA_REFRESH_DEFAULT=14400
-    # MySQL / MariaDB
-    depends_on:
-      pdns-mysql:
-        condition: service_healthy
 
   pdns-mysql:
     image: mariadb:10.3
     hostname: pdns-mysql
     container_name: pdns-mysql
+    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
     mem_limit: 256M
     memswap_limit: 256M
     expose:
@@ -151,24 +170,8 @@ services:
       - /etc/timezone:/etc/timezone:ro
     networks:
       - default
-    command: --character_set_client=utf8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
     environment:
       - MYSQL_DATABASE=${PDNS_DB_NAME}
       - MYSQL_USER=${PDNS_DB_USER}
       - MYSQL_PASSWORD=${PDNS_DB_PASSWORD}
       - MYSQL_RANDOM_ROOT_PASSWORD=1
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 5
-
-networks:
-  default:
-
-volumes:
-  powerdns-admin-upload:
-  powerdns-admin-logs:
-  powerdns-admin-db:
-  # MySQL / MariaDB
-  powerdns-admin-mysql-data:
-  powerdns-mysql-data:

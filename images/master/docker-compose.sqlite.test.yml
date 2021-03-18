@@ -1,5 +1,15 @@
 version: "2.3"
 
+networks:
+  default:
+
+volumes:
+  powerdns-admin-upload:
+  powerdns-admin-logs:
+  powerdns-admin-db:
+  # SQLite
+  powerdns-sqlite-data:
+
 services:
   # https://docs.docker.com/docker-hub/builds/automated-testing/
   sut:
@@ -11,6 +21,10 @@ services:
       - pdns-server
     volumes_from:
       - powerdns-admin
+    environment:
+      - DOCKER_TEST_CONTAINER=powerdns-admin
+      - DOCKER_WEB_CONTAINER=powerdns-admin
+      - DOCKER_WEB_PORT=${PDA_PORT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -21,11 +35,10 @@ services:
       context: ./
       dockerfile: Dockerfile
       args:
+        - TAG=${DOCKER_TAG}
         - VCS_REF=${VCS_REF}
         - BUILD_DATE=${BUILD_DATE}
-    image: powerdns-admin
-    # For production, download prebuilt image
-    #image: monogramm/docker-powerdns-admin:%%VERSION%%
+    image: ${IMAGE_NAME}
     hostname: powerdns-admin
     container_name: powerdns-admin
     mem_limit: 256M
@@ -98,13 +111,3 @@ services:
       - PDNS_WEBSERVER_PORT=${PDNS_PORT}
       - PDNS_WEBSERVER_ALLOW_FROM=${PDNS_WEBSERVER_ALLOW_FROM}/0
       - PDNS_SOA_REFRESH_DEFAULT=14400
-
-networks:
-  default:
-
-volumes:
-  powerdns-admin-upload:
-  powerdns-admin-logs:
-  powerdns-admin-db:
-  # SQLite
-  powerdns-sqlite-data:
