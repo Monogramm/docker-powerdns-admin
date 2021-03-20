@@ -7,11 +7,26 @@ log() {
   echo "[$(date +%Y-%m-%dT%H:%M:%S%:z)] $*"
 }
 
+# date_greater A B returns whether A > B
+date_greater() {
+    [ "$(date -u -d "$1" -D "%Y-%m-%dT%H:%M:%SZ" +%s)" -gt "$(date -u -d "$2" -D "%Y-%m-%dT%H:%M:%SZ" +%s)" ];
+}
+
 # == Vars
 #
-if [ ! -d ./db/migrations ] || [ ./migrations -nt ./db/migrations ]; then
+installed_build_date="1970-01-01T00:00:00Z"
+if [ -f '.docker/build-date' ]; then
+    installed_build_date=$(cat .docker/build-date)
+fi
+
+image_build_date="1970-01-01T00:00:00Z"
+if [ -f './db/.docker-db-init' ]; then
+    image_build_date=$(cat ./db/.docker-db-init)
+fi
+
+if [ ! -d ./db/migrations ] || date_greater "$image_build_date" "$installed_build_date"; then
   log "===> Preparing Database migrations"
-  cp -rf ./migrations ./db/
+  cp -urf ./migrations ./db/
 fi
 DB_MIGRATION_DIR=./db/migrations
 
@@ -80,7 +95,7 @@ if [ ! -f "./db/.docker-db-init" ]; then
 
   log "---> Running DB Migration"
   set +e
-  flask db upgrade --directory ${DB_MIGRATION_DIR}
+  flask db upgrade --directory "${DB_MIGRATION_DIR}"
   set -e
 
   log "---> Initializing settings"
@@ -91,14 +106,16 @@ if [ ! -f "./db/.docker-db-init" ]; then
     ./init_admin.py
   fi
 
-  touch ./db/.docker-db-init
+  cp .docker/build-date ./db/.docker-db-init
 
 else
 
   log "---> Running DB Upgrade"
   set +e
-  flask db upgrade --directory ${DB_MIGRATION_DIR}
+  flask db upgrade --directory "${DB_MIGRATION_DIR}"
   set -e
+
+  cp -f .docker/build-date ./db/.docker-db-init
 
 fi
 

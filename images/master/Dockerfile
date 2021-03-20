@@ -25,12 +25,15 @@ VOLUME [ "/app/db", "/app/upload", "/app/logs", "/app/migrations" ]
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn","powerdnsadmin:create_app()","--user","pda","--group","pda"]
 
-USER pda
-
 # Arguments to label built container
 ARG VCS_REF
 ARG BUILD_DATE
 ARG VERSION=master
+
+RUN set -ex; \
+  mkdir -p .docker; \
+  echo "${VERSION} ${VCS_REF} ${BUILD_DATE}" > .docker/version; \
+  echo "${BUILD_DATE}" > .docker/build-date
 
 # Container labels (http://label-schema.org/)
 # Container annotations (https://github.com/opencontainers/image-spec)
@@ -55,3 +58,5 @@ LABEL maintainer="Monogramm maintainers <opensource at monogramm dot io>" \
       org.opencontainers.image.vendor="Khanh Ngo" \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.authors="Monogramm maintainers <opensource at monogramm dot io>"
+
+USER pda
