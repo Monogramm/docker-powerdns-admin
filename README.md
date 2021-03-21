@@ -1,5 +1,5 @@
 [![License: AGPL v3][uri_license_image]][uri_license]
-[![Build Status](https://travis-ci.org/Monogramm/docker-powerdns-admin.svg)](https://travis-ci.org/Monogramm/docker-powerdns-admin)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Monogramm/docker-powerdns-admin/Docker%20Image%20CI)](https://github.com/Monogramm/docker-powerdns-admin/actions)
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/monogramm/docker-powerdns-admin.svg)](https://hub.docker.com/r/monogramm/docker-powerdns-admin/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/monogramm/docker-powerdns-admin.svg)](https://hub.docker.com/r/monogramm/docker-powerdns-admin/)
 [![Docker layers](https://images.microbadger.com/badges/image/monogramm/docker-powerdns-admin.svg)](https://microbadger.com/images/monogramm/docker-powerdns-admin)
