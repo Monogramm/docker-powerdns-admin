@@ -41,6 +41,8 @@ with app.app_context():
         'LDAP_FILTER_BASIC',
         'LDAP_FILTER_USERNAME',
         'LDAP_SG_ENABLED',
+        'LDAP_FILTER_GROUP',
+        'LDAP_FILTER_GROUPNAME',
         'LDAP_ADMIN_GROUP',
         'LDAP_OPERATOR_GROUP',
         'LDAP_USER_GROUP',
