@@ -91,33 +91,21 @@ fi
 
 
 log "===> Database management"
-if [ ! -f "./db/.docker-db-init" ]; then
 
-  log "---> Running DB Migration"
-  set +e
-  flask db upgrade --directory "${DB_MIGRATION_DIR}"
-  set -e
+log "---> Running DB Migration"
+set +e
+flask db upgrade --directory "${DB_MIGRATION_DIR}"
+set -e
 
-  log "---> Initializing settings"
-  ./init_setting.py
+log "---> Initializing settings"
+./init_setting.py
 
-  if [ -n "${ADMIN_USERNAME}" ] && [ -n "${ADMIN_PASSWORD}" ] && [ -n "${ADMIN_EMAIL}" ]; then
-    log "---> Initializing admin user"
-    ./init_admin.py
-  fi
-
-  cp .docker/build-date ./db/.docker-db-init
-
-else
-
-  log "---> Running DB Upgrade"
-  set +e
-  flask db upgrade --directory "${DB_MIGRATION_DIR}"
-  set -e
-
-  cp -f .docker/build-date ./db/.docker-db-init
-
+if [ -n "${ADMIN_USERNAME}" ] && [ -n "${ADMIN_PASSWORD}" ] && [ -n "${ADMIN_EMAIL}" ]; then
+  log "---> Initializing admin user"
+  ./init_admin.py
 fi
+
+cp -f .docker/build-date ./db/.docker-db-init
 
 
 if [ "$1" = "gunicorn" ]; then
