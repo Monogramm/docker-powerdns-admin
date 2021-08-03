@@ -20,11 +20,32 @@ jobs:
       - name: Check Out Repo
         uses: actions/checkout@v2
 
-      - name: Execute CI hooks
-        id: docker_hooks
+      - name: Execute CI build hooks
+        id: docker_build
         run: |
           cd images/${{ matrix.version }}
-          ./hooks/run
+          ./hooks/run build
 
       - name: Display docker images
         run: docker images
+
+      - name: Execute CI test hooks
+        id: docker_hooks
+        run: |
+          cd images/${{ matrix.version }}
+          ./hooks/run test
+
+      - name: Execute CI push hooks
+        id: docker_push
+        if: ${{ github.event_name == 'push' && ( github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' ) }}
+        run: |
+          cd images/${{ matrix.version }}
+          # Export variables to login and push to GitHub Container Registry
+          #export DOCKER_REGISTRY=ghcr.io
+          #export DOCKER_LOGIN=${{ github.repository_owner }}
+          #export DOCKER_PASSWORD=${{ secrets.GITHUB_REGISTRY_TOKEN }}
+          #./hooks/run push
+          # Export variables to login and push to DockerHub Registry
+          export DOCKER_LOGIN=${{ secrets.DOCKERHUB_REGISTRY_LOGIN }}
+          export DOCKER_PASSWORD=${{ secrets.DOCKERHUB_REGISTRY_TOKEN }}
+          ./hooks/run push ${{ matrix.variant }}

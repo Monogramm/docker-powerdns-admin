@@ -3,9 +3,5 @@
 # See documentation for details:
 # https://docs.docker.com/docker-hub/builds/advanced/
 
-if [ ! -d ./coverage ]; then
-    mkdir -p ./coverage
-fi
-
 #echo 'Removing persisted data...'
 #rm -rf "${APP_HOME:-.docker/app}"
